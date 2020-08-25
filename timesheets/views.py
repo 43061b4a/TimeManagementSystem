@@ -1,17 +1,14 @@
 from rest_framework import generics
-from rest_framework import permissions
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
 
 from timesheets.models import Work
-from timesheets.serializers import TimesheetSerializer
+from timesheets.serializers import WorkSerializer
 
 
-class TimesheetListAPIView(generics.ListCreateAPIView):
+class WorkList(generics.ListCreateAPIView):
     queryset = Work.objects.all()
-    serializer_class = TimesheetSerializer
-    authentication_classes = (SessionAuthentication, BasicAuthentication)
-    permission_classes = [permissions.IsAuthenticated]
+    serializer_class = WorkSerializer
 
-    def perform_create(self, serializer):
-        serializer.save(employee=self.request.user)
-        serializer.save(manager=self.request.user)
+
+class WorkDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Work.objects.all()
+    serializer_class = WorkSerializer

@@ -3,8 +3,8 @@ from django.contrib.auth import get_user_model
 
 
 class Work(models.Model):
-    employee = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='employee')
-    manager = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='manager')
+    # employee = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='employee')
+    # manager = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='manager')
     description = models.TextField()
     duration = models.IntegerField()
     workday = models.DateField()

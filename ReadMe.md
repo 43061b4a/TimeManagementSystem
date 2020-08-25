@@ -17,4 +17,16 @@ python manage.py runserver
 ```
 django-admin startapp timesheets
 curl -H 'Accept: application/json; indent=4' -u admin:dimsumdim123 http://127.0.0.1:8000/users/
+
+from rest_framework.renderers import JSONRenderer
+from rest_framework.parsers import JSONParser
+from timesheets.models import Work
+from timesheets.serializers import TimesheetSerializer
+
+work = Work(description="Apple", duration=1,workday="2020-10-1")
+work.save()
+work = Work(description="Cat", duration=2,workday="2020-10-1")
+work.save()
+seri = TimesheetSerializer(work)
+seri.data
 ```

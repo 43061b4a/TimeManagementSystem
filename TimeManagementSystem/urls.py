@@ -13,14 +13,18 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
+from django.conf.urls import url
 from django.urls import include, path
+from django.views.generic import RedirectView
 from rest_framework import routers
 
 router = routers.DefaultRouter()
+favicon_view = RedirectView.as_view(url='/static/images/favicon.ico', permanent=True)
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
     path('', include('timesheets.urls')),
-    path('api-auth/', include('rest_framework.urls', namespace='rest_framework'))
+    path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
+    url(r'^favicon\.ico$', favicon_view)
 ]

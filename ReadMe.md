@@ -5,9 +5,7 @@
 ```
 rm -f db.sqlite3
 rm -r timesheets/migrations
-rm -r users/migrations
 python manage.py makemigrations timesheets
-python manage.py makemigrations users
 python manage.py migrate
 echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('superadmin', 'superadmin@myproject.com', 'password123')" | python manage.py shell
 python manage.py runserver

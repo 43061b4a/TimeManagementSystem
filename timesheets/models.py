@@ -1,10 +1,8 @@
 from django.db import models
-from django.contrib.auth import get_user_model
 
 
 class Work(models.Model):
-    # employee = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='employee')
-    # manager = models.ForeignKey(get_user_model(), on_delete=models.CASCADE, related_name='manager')
+    owner = models.ForeignKey('auth.User', related_name='work', on_delete=models.CASCADE)
     description = models.TextField()
     duration = models.IntegerField()
     workday = models.DateField()

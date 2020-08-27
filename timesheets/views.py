@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.http import Http404
 from rest_framework import generics
 from rest_framework import permissions
 from rest_framework import status
@@ -42,17 +43,6 @@ class UserList(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-# class UserList(generics.RetrieveUpdateDestroyAPIView):
-#     queryset = User.objects.all()
-#     serializer_class = UserRootSerializer
-#     permission_classes = [permissions.IsAdminUser]
-
-
-# class UserDetail(generics.RetrieveAPIView):
-#     queryset = User.objects.all()
-#     serializer_class = UserRootSerializer
-#     permission_classes = [permissions.IsAdminUser]
-
 class UserDetail(APIView):
     permission_classes = [permissions.IsAdminUser]
     """
@@ -63,7 +53,7 @@ class UserDetail(APIView):
         try:
             return User.objects.get(pk=pk)
         except User.DoesNotExist:
-            raise status.HTTP_404_NOT_FOUND
+            raise Http404
 
     def get(self, request, pk, format=None):
         user = self.get_object(pk)

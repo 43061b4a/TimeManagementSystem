@@ -14,5 +14,8 @@ class Work(models.Model):
 
 
 class Profile(models.Model):
-    owner = models.OneToOneField('auth.User', on_delete=models.CASCADE)
-    preferred_working_hours = models.IntegerField()
+    owner = models.OneToOneField('auth.User', on_delete=models.CASCADE, related_name='profile')
+    preferred_working_hours = models.IntegerField(default=8)
+
+    def __unicode__(self):
+        return u'Preferred working hours: {0}'.format(self.preferred_working_hours)

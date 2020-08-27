@@ -3,7 +3,7 @@ from django.urls import path
 from timesheets import views
 
 urlpatterns = [
-    path('', views.api_root),
+    path('', views.api_root, name="time-management-system"),
     path('timesheets/', views.WorkList.as_view(), name='work-list'),
     path('timesheets/<int:pk>/', views.WorkDetail.as_view(), name='work-detail'),
     path('users/', views.UserList.as_view(), name='user-list'),

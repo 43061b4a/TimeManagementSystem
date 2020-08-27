@@ -13,45 +13,59 @@ from timesheets.serializers import WorkSerializer, UserSerializer, UserRootSeria
 
 
 class WorkList(generics.ListCreateAPIView):
-    queryset = Work.objects.all()
     serializer_class = WorkSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        current_user = User.objects.get(username=self.request.user)
+        if current_user.is_superuser or current_user.is_staff:
+            return Work.objects.all()
+        else:
+            return Work.objects.filter(owner=current_user)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
 
 class WorkDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Work.objects.all()
     serializer_class = WorkSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def get_queryset(self):
+        current_user = User.objects.get(username=self.request.user)
+        if current_user.is_superuser or current_user.is_staff:
+            return Work.objects.all()
+        else:
+            return Work.objects.filter(owner=current_user)
+
 
 class UserList(APIView):
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, format=None):
-        users = User.objects.all()
+        current_user = User.objects.get(username=self.request.user)
+        if current_user.is_superuser or current_user.is_staff:
+            users = User.objects.all()
+        else:
+            users = User.objects.filter(username=current_user.username)
+
         serializer = UserRootSerializer(users, many=True)
         return Response(serializer.data)
 
-    def post(self, request, format=None):
-        serializer = UserRootSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 class UserDetail(APIView):
-    permission_classes = [permissions.IsAdminUser]
+    permission_classes = [permissions.IsAuthenticated]
     """
     Retrieve, update or delete a snippet instance.
     """
 
     def get_object(self, pk):
         try:
-            return User.objects.get(pk=pk)
+            current_user = User.objects.get(username=self.request.user)
+            if current_user.is_superuser or current_user.is_staff:
+                return User.objects.get(pk=pk)
+            else:
+                return current_user
         except User.DoesNotExist:
             raise Http404
 
@@ -77,7 +91,6 @@ class UserDetail(APIView):
 
 
 class UserCreate(generics.CreateAPIView):
-    queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = [permissions.AllowAny]
 

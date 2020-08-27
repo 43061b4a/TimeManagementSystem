@@ -11,3 +11,8 @@ class Work(models.Model):
 
     class Meta:
         ordering = ['created_at']
+
+
+class Profile(models.Model):
+    owner = models.OneToOneField('auth.User', on_delete=models.CASCADE)
+    preferred_working_hours = models.IntegerField()

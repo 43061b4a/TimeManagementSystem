@@ -8,4 +8,5 @@ urlpatterns = [
     path('timesheets/<int:pk>/', views.WorkDetail.as_view(), name='work-detail'),
     path('users/', views.UserList.as_view(), name='user-list'),
     path('users/<int:pk>/', views.UserDetail.as_view(), name='user-detail'),
+    path('register/', views.UserCreate.as_view(), name='user-register'),
 ]

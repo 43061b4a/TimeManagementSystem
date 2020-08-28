@@ -15,7 +15,7 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.urls import include, path
-from django.views.generic import RedirectView
+from django.views.generic import RedirectView, TemplateView
 from rest_framework import routers
 
 router = routers.DefaultRouter()
@@ -24,7 +24,8 @@ favicon_view = RedirectView.as_view(url='/static/images/favicon.ico', permanent=
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
-    path('', include('timesheets.urls')),
+    path('', TemplateView.as_view(template_name='index.html')),
+    path('api/', include('timesheets.urls')),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^favicon\.ico$', favicon_view)
 ]

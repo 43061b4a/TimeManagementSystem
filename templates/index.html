@@ -35,6 +35,7 @@
 <script src="https://unpkg.com/vue"></script>
 <script src="https://unpkg.com/vue-router"></script>
 <script src="https://unpkg.com/vuex"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
 <!-- Vue templates -->
 <template id="registration-template">
@@ -59,7 +60,14 @@
 
     // router
     const routes = [
-        {component: Registration, path: 'api/register/',},
+        {
+            path: '/api/api-token-auth/', name: 'login',
+            component: Login, meta: {guest: true}
+        },
+        {
+            path: '/api/register', name: 'register',
+            component: Register, meta: {guest: true}
+        },
     ]
 
     const router = new VueRouter({

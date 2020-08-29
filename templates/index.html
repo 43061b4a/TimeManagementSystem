@@ -1,3 +1,4 @@
+{% load static %}
 <!doctype html>
 <html lang="en">
 <head>
@@ -13,22 +14,30 @@
 </head>
 <body class="bg-light">
 <div class="bg-white container">
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-        <a class="navbar-brand" href="/">Time Management System</a>
-        <ul class="navbar-nav ml-auto">
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#registrationModal">
-                Register
-            </button>
-            <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#loginModal">
-                Login
-            </button>
-        </ul>
-    </nav>
-
     <!-- Content -->
-    <div id="myapp">
+    <div id="app">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+            <a class="navbar-brand" href="/">Time Management System</a>
+            <ul class="navbar-nav ml-auto">
+                <li v-if="isAuthenticated">
+                    <router-link to="/logout" type="button" class="btn btn-primary">Logout</router-link>
+                </li>
+            </ul>
+        </nav>
+        <section class="jumbotron text-center" v-if="!isAuthenticated">
+            <div class="container">
+                <h1 class="jumbotron-heading">Time Management System</h1>
+                <p class="lead text-muted">Please login or register to continue.</p>
+                <p>
+                    <router-link to="/login" class="btn btn-primary my-2">Login</router-link>
+                    <router-link to="/register" class="btn btn-secondary my-2">Register</router-link>
+                </p>
+            </div>
+        </section>
         <router-view></router-view>
     </div>
+
+    <hr/>
 </div>
 
 <!-- Vue.js -->
@@ -38,52 +47,64 @@
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 
 <!-- Vue templates -->
-<template id="registration-template">
-    <div class="registration">
-        <h2>Registration</h2>
-        <user-item
-
-        ></user-item>
+<template id="login-template">
+    <div class="login">
+        <h2>Login</h2>
+        <form @submit.prevent="login">
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input required v-model="username" type="text" class="form-control">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input required v-model="password" type="password" type=" password" class="form-control">
+            </div>
+            <div class="form-group">
+                <button type="submit" text="Login"
+                        class="btn btn-primary my-2">Login
+                </button>
+            </div>
+        </form>
     </div>
 </template>
 
-<!-- Vue app -->
-<script>
-    // store
-    const store = new Vuex.Store({
-        state: {},
-        getters: {}
-    })
+<template id="logout-template">
+    <div class="login">
+        Successfully logged out.
+    </div>
+</template>
 
-    // components
+<template id="register-template">
+    <div class="register">
+        <h2>Register</h2>
+        <form>
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input name="email" type="email" class="form-control" placeholder="jim@gmail.com">
+            </div>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input name="username" type="text" class="form-control" placeholder="jim">
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input name="password" type="password" class="form-control" placeholder="*******">
+            </div>
+            <div class="form-group">
+                <label for="preferred_working_hours">Preferred Working Hours</label>
+                <input name="preferred_working_hours" type="text"
+                       class="form-control" placeholder="8">
+            </div>
+            <div class="form-group">
+                <button type="submit" text="Register"
+                        class="btn btn-primary my-2">Register
+                </button>
+            </div>
+        </form>
+    </div>
+</template>
 
-
-    // router
-    const routes = [
-        {
-            path: '/api/api-token-auth/', name: 'login',
-            component: Login, meta: {guest: true}
-        },
-        {
-            path: '/api/register', name: 'register',
-            component: Register, meta: {guest: true}
-        },
-    ]
-
-    const router = new VueRouter({
-        mode: 'history',
-        routes: routes,
-    })
-
-    // app
-    const myapp = new Vue({
-        router,
-        store,
-    }).$mount('#myapp');
-
-</script>
-
-
+<script src="{% static "index.js" %}"></script>
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
         integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
@@ -95,75 +116,6 @@
         integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV"
         crossorigin="anonymous"></script>
 
-<!-- Modal -->
-<div class="modal fade" id="registrationModal" tabindex="-1" role="dialog" aria-labelledby="registrationModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="registrationModalLabel">Registration</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="form-group">
-                        <label for="email">Email</label>
-                        <input id="email" name="email" type="email" class="form-control" placeholder="jim@gmail.com">
-                    </div>
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <input id="username" name="username" type="text" class="form-control" placeholder="jim">
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input id="password" name="password" type="password" class="form-control" placeholder="*******">
-                    </div>
-                    <div class="form-group">
-                        <label for="preferred_working_hours">Preferred Working Hours</label>
-                        <input id="preferred_working_hours" name="preferred_working_hours" type="text"
-                               class="form-control" placeholder="8">
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Save changes</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel"
-     aria-hidden="true">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="loginModalLabel">Login</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="form-group">
-                        <label for="username">Username</label>
-                        <input id="username" name="username" type="text" class="form-control">
-                    </div>
-                    <div class="form-group">
-                        <label for="password">Password</label>
-                        <input id="password" name="password" type="password" class="form-control">
-                    </div>
-                </form>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary">Login</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 </body>
 </html>

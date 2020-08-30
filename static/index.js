@@ -72,11 +72,9 @@ const store = new Vuex.Store({
         [AUTH_SUCCESS]: (state, resp) => {
             state.status = "success";
             state.token = resp.data.token;
-            state.hasLoadedOnce = true;
         },
         [AUTH_ERROR]: state => {
             state.status = "error";
-            state.hasLoadedOnce = true;
         },
         [AUTH_LOGOUT]: state => {
             state.token = "";
@@ -113,7 +111,7 @@ const Login = Vue.component('login', {
         login: function () {
             const {username, password} = this
             this.$store.dispatch(AUTH_REQUEST, {username, password}).then(() => {
-                this.$router.push('/')
+                this.$router.push('/timesheet')
             }).catch(err => {
                 console.log(err.response.data)
             });
@@ -147,6 +145,7 @@ const Register = Vue.component('register', {
         }
     },
 });
+
 const Logout = Vue.component('logout', {
     data() {
         return {};
@@ -161,6 +160,7 @@ const Logout = Vue.component('logout', {
         this.logout()
     }
 });
+
 const RegisterStatus = Vue.component('register-status', {
     data() {
         return {};
@@ -173,6 +173,27 @@ const RegisterStatus = Vue.component('register-status', {
     },
 });
 
+const Timesheet = Vue.component('timesheet', {
+    data() {
+        return {
+            workdate: null,
+            attributes: [
+                {
+                    key: 'today',
+                    highlight: true,
+                }
+            ]
+        };
+    },
+    methods: {
+        date_change: function () {
+            const selected_date = new Date(this.workdate);
+            console.log(selected_date.toISOString());
+        }
+    },
+    template: '#timesheet-template',
+    computed: {},
+});
 // router
 const routes = [
     {
@@ -194,7 +215,12 @@ const routes = [
         path: '/register_status',
         name: 'register_status',
         component: RegisterStatus
-    }
+    },
+    {
+        path: '/timesheet',
+        name: 'timesheet',
+        component: Timesheet
+    },
 ]
 
 const router = new VueRouter({

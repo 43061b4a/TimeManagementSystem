@@ -20,7 +20,7 @@
             <a class="navbar-brand" href="/">Time Management System</a>
             <ul class="navbar-nav ml-auto">
                 <li v-if="isAuthenticated">
-                    <router-link to="/logout" type="button" class="btn btn-primary">Logout</router-link>
+                    <router-link to="/logout" type="button" class="btn btn-secondary my-2">Logout</router-link>
                 </li>
             </ul>
         </nav>
@@ -36,7 +36,6 @@
         </section>
         <router-view></router-view>
     </div>
-
     <hr/>
 </div>
 
@@ -57,7 +56,10 @@
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
-                <input required v-model="password" type="password" type=" password" class="form-control">
+                <input required v-model="password" type="password" class="form-control">
+            </div>
+            <div v-if="isAuthError">
+                Invalid credentials.
             </div>
             <div class="form-group">
                 <button type="submit" text="Login"
@@ -69,31 +71,42 @@
 </template>
 
 <template id="logout-template">
-    <div class="login">
+    <div class="logout">
         Successfully logged out.
+    </div>
+</template>
+
+<template id="register-status-template">
+    <div class="registration-status">
+        <div class="register-success" v-if="isRegistered">
+            Successfully registered. Please login to continue.
+        </div>
     </div>
 </template>
 
 <template id="register-template">
     <div class="register">
         <h2>Register</h2>
-        <form>
+        <form @submit.prevent="register">
             <div class="form-group">
                 <label for="email">Email</label>
-                <input name="email" type="email" class="form-control" placeholder="jim@gmail.com">
+                <input required v-model="email" class="form-control" placeholder="jim@gmail.com">
             </div>
             <div class="form-group">
                 <label for="username">Username</label>
-                <input name="username" type="text" class="form-control" placeholder="jim">
+                <input required v-model="username" type="text" class="form-control" placeholder="jim">
             </div>
             <div class="form-group">
                 <label for="password">Password</label>
-                <input name="password" type="password" class="form-control" placeholder="*******">
+                <input required v-model="password" type="password" class="form-control" placeholder="*******">
             </div>
             <div class="form-group">
                 <label for="preferred_working_hours">Preferred Working Hours</label>
-                <input name="preferred_working_hours" type="text"
+                <input required v-model="preferred_working_hours" type="text"
                        class="form-control" placeholder="8">
+            </div>
+            <div class="register-failed" v-if="registerError">
+                Registration failed. Please try again.
             </div>
             <div class="form-group">
                 <button type="submit" text="Register"

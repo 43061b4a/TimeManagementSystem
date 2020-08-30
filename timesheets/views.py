@@ -26,7 +26,11 @@ class WorkList(generics.ListCreateAPIView):
             return Work.objects.filter(owner=current_user)
 
     def perform_create(self, serializer):
-        serializer.save(owner=self.request.user)
+        current_user = User.objects.get(username=self.request.user)
+        if current_user.is_superuser or current_user.is_staff:
+            serializer.save()
+        else:
+            serializer.save(owner=self.request.user)
 
 
 class WorkDetail(generics.RetrieveUpdateDestroyAPIView):

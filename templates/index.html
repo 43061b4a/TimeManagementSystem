@@ -49,7 +49,6 @@
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script src='https://unpkg.com/v-calendar'></script>
 
-
 <!-- Vue templates -->
 <template id="login-template">
     <div class="login">
@@ -130,38 +129,35 @@
                 Timesheet
             </h1>
             <hr/>
-            <form>
+            <form @submit.prevent="log_work">
                 <div class="form-group">
                     <v-date-picker
-                            v-model='workdate'
+                            v-model='workday'
                             @input="date_change"
                             :input-props='{
                                     class: "form-control",
-                                    placeholder: "Please select workday",
                                     readonly: true
                                   }'
                     />
                 </div>
-                <div class="form-row">
-                    <div class="form-group col-md-5">
-                        <label for="duration">Duration</label>
-                        <input required type="text" class="form-control" placeholder="8">
+                <div class="time_entry">
+                    <div class="form-row">
+                        <div class="form-group col-md-3">
+                            <label for="duration">Duration</label>
+                            <input required type="text" v-model="duration" class="form-control" placeholder="8">
+                        </div>
+                        <div class="form-group col-md-7">
+                            <label for="description">Description</label>
+                            <input required type="text" v-model="description" class="form-control"
+                                   placeholder="Styling homepage">
+                        </div>
+                        <div class="form-group col-md-2">
+                            <br/>
+                            <button type="submit" name="work_log" text="Register"
+                                    class="form-control btn btn-info my-2">Log Work
+                            </button>
+                        </div>
                     </div>
-                    <div class="form-group col-md-5">
-                        <label for="description">Description</label>
-                        <input required type="text" class="form-control" placeholder="Styling homepage">
-                    </div>
-                    <div class="form-group col-md-2">
-                        <br/>
-                        <button type="submit" text="Register" class="form-control btn btn-info my-2">Add Row</button>
-                    </div>
-                </div>
-                <div class="form-row">
-                    <div class="form-group col-md-4"></div>
-                    <div class="form-group col-md-4">
-                        <button type="submit" text="Register" class="form-control btn btn-primary my-2">Save Timesheet</button>
-                    </div>
-                    <div class="form-group col-md-4"></div>
                 </div>
             </form>
         </div>

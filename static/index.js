@@ -1,6 +1,7 @@
 //URLS:
 const AUTH_URL = "/api/api-token-auth/"
 const REGISTER_URL = "/api/register/"
+const TIMESHEET_RESOURCE_URL = "/api/timesheets/"
 
 const AUTH_REQUEST = "AUTH_REQUEST";
 const AUTH_SUCCESS = "AUTH_SUCCESS";
@@ -9,6 +10,10 @@ const AUTH_LOGOUT = "AUTH_LOGOUT";
 const AUTH_REGISTER = "AUTH_REGISTER";
 const AUTH_REGISTER_SUCCESS = "AUTH_REGISTER_SUCCESS";
 const AUTH_REGISTER_ERROR = "AUTH_REGISTER_ERROR";
+
+const TIMESHEET_LOG_WORK = "TIMESHEET_LOG_WORK"
+const TIMESHEET_LOG_WORK_SUCCESS = "TIMESHEET_LOG_WORK_SUCCESS"
+const TIMESHEET_LOG_WORK_ERROR = "TIMESHEET_LOG_WORK_ERROR"
 
 // store
 const store = new Vuex.Store({
@@ -21,6 +26,7 @@ const store = new Vuex.Store({
         isAuthenticated: state => !!state.token,
         authStatus: state => state.status,
         registerStatus: state => state.registered,
+        authToken: state => state.token
     },
     actions: {
         [AUTH_REQUEST]: ({commit, dispatch}, user) => {
@@ -29,7 +35,7 @@ const store = new Vuex.Store({
                 axios({url: AUTH_URL, data: user, method: "POST"})
                     .then(resp => {
                         localStorage.setItem("user-token", resp.token);
-                        axios.defaults.headers.common['Authorization'] = "Token" + resp.data.token
+                        axios.defaults.headers.common['Authorization'] = "Token " + resp.data.token
                         commit(AUTH_SUCCESS, resp);
                         resolve(resp);
                     })
@@ -64,6 +70,22 @@ const store = new Vuex.Store({
                     });
             });
         },
+        [TIMESHEET_LOG_WORK]: ({commit, dispatch, getters}, work_log) => {
+            console.log(work_log);
+            return new Promise((resolve, reject) => {
+                commit(TIMESHEET_LOG_WORK);
+                axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
+                axios.post(TIMESHEET_RESOURCE_URL, work_log)
+                    .then(resp => {
+                        commit(TIMESHEET_LOG_WORK_SUCCESS, resp);
+                        resolve(resp);
+                    })
+                    .catch(err => {
+                        commit(TIMESHEET_LOG_WORK_ERROR, err);
+                        reject(err);
+                    });
+            });
+        },
     },
     mutations: {
         [AUTH_REQUEST]: state => {
@@ -90,6 +112,17 @@ const store = new Vuex.Store({
             state.registered = "registered";
             state.registration_errors = "";
         },
+        [TIMESHEET_LOG_WORK]: state => {
+            state.status = "LoggingWork";
+        },
+        [TIMESHEET_LOG_WORK_ERROR]: (state, err) => {
+            state.state = "error";
+            state.error = err;
+        },
+        [TIMESHEET_LOG_WORK_SUCCESS]: (state, resp) => {
+            state.state = "registered";
+            state.error = "";
+        },
     }
 })
 
@@ -113,7 +146,7 @@ const Login = Vue.component('login', {
             this.$store.dispatch(AUTH_REQUEST, {username, password}).then(() => {
                 this.$router.push('/timesheet')
             }).catch(err => {
-                console.log(err.response.data)
+                console.log(err)
             });
         }
     }
@@ -176,7 +209,9 @@ const RegisterStatus = Vue.component('register-status', {
 const Timesheet = Vue.component('timesheet', {
     data() {
         return {
-            workdate: null,
+            workday: new Date(),
+            description: "",
+            duration: null,
             attributes: [
                 {
                     key: 'today',
@@ -187,8 +222,20 @@ const Timesheet = Vue.component('timesheet', {
     },
     methods: {
         date_change: function () {
-            const selected_date = new Date(this.workdate);
+            const selected_date = new Date(this.workday);
             console.log(selected_date.toISOString());
+        },
+        log_work: function () {
+            let {workday, description, duration} = this
+            workday = workday.toISOString().substring(0, 10);
+            this.$store.dispatch(TIMESHEET_LOG_WORK, {workday, description, duration}).then(() => {
+                this.update_logged_work()
+            }).catch(err => {
+                console.log(err)
+            });
+        },
+        update_logged_work: function () {
+
         }
     },
     template: '#timesheet-template',

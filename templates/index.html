@@ -128,8 +128,7 @@
             <h1>
                 Timesheet
             </h1>
-            <small class="text-muted">Your preferred Working Hours: <span
-                    v-once>{{ preferredWorkingHours }}</span></small>
+            <small class="text-muted">Your Preferred Working Hours: <span v-once>{{ preferredWorkingHours }}</span></small>
             <hr/>
             <form @submit.prevent="log_work">
                 <div class="form-group">
@@ -162,32 +161,32 @@
                         </div>
                     </div>
                 </div>
-                <div class="time_logs">
-                    <template v-for="log in timesheet">
-                        <div class="form-row">
-                            <div class="form-group col-md-3">
-                                <input required type="text" class="form-control align-top" placeholder="8"
-                                       v-model="log.duration"
-                                       v-bind:class="{ 'bg-danger': highlight_hours, 'bg-success':!highlight_hours }">
-                            </div>
-                            <div class="form-group col-md-7">
-                                <input required type="text" class="form-control align-top" placeholder="8"
-                                       v-model="log.description">
-                            </div>
-                            <div class="form-group col-md-1">
-                                <button type="button" name="work_update" text="Register"
-                                        class="form-control btn btn-info align-top" @click="update_work(log)">Update
-                                </button>
-                            </div>
-                            <div class="form-group col-md-1">
-                                <button type="button" name="work_update" text="Register"
-                                        class="form-control btn btn-danger align-top" @click="delete_work(log)">Delete
-                                </button>
-                            </div>
-                        </div>
-                    </template>
-                </div>
             </form>
+            <div class="time_logs">
+                <template v-for="log in timesheet">
+                    <div class="form-row">
+                        <div class="form-group col-md-3">
+                            <input required type="text" class="form-control align-top" placeholder="8"
+                                   v-model="log.duration"
+                                   v-bind:class="{ 'bg-danger': highlight_hours, 'bg-success':!highlight_hours }">
+                        </div>
+                        <div class="form-group col-md-7">
+                            <input required type="text" class="form-control align-top" placeholder="8"
+                                   v-model="log.description">
+                        </div>
+                        <div class="form-group col-md-1">
+                            <button type="button" name="work_update" text="Register"
+                                    class="form-control btn btn-info align-top" @click="update_work(log)">Update
+                            </button>
+                        </div>
+                        <div class="form-group col-md-1">
+                            <button type="button" name="work_update" text="Register"
+                                    class="form-control btn btn-danger align-top" @click="delete_work(log)">Delete
+                            </button>
+                        </div>
+                    </div>
+                </template>
+            </div>
         </div>
     </div>
 </template>

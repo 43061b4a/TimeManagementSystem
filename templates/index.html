@@ -163,19 +163,22 @@
                     <template v-for="log in timesheet">
                         <div class="form-row">
                             <div class="form-group col-md-3">
-                                {{ log.duration }}
+
+                                <input required type="text" class="form-control align-top" placeholder="8"
+                                       v-model="log.duration">
                             </div>
                             <div class="form-group col-md-7">
-                                {{ log.description }}
+                                <input required type="text" class="form-control align-top" placeholder="8"
+                                       v-model="log.description">
                             </div>
                             <div class="form-group col-md-1">
-                                <button type="submit" name="work_update" text="Register"
-                                        class="form-control btn btn-info my-2">Update
+                                <button type="button" name="work_update" text="Register"
+                                        class="form-control btn btn-info align-top" @click="update_work(log)">Update
                                 </button>
                             </div>
                             <div class="form-group col-md-1">
                                 <button type="button" name="work_update" text="Register"
-                                        class="form-control btn btn-danger my-2" @click="delete_work(log)">Delete
+                                        class="form-control btn btn-danger align-top" @click="delete_work(log)">Delete
                                 </button>
                             </div>
                         </div>

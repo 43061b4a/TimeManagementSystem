@@ -23,6 +23,11 @@ const TIMESHEET_DELETE_WORK = "TIMESHEET_DELETE_WORK"
 const TIMESHEET_DELETE_WORK_SUCCESS = "TIMESHEET_DELETE_WORK_SUCCESS"
 const TIMESHEET_DELETE_WORK_ERROR = "TIMESHEET_DELETE_WORK_ERROR"
 
+const TIMESHEET_UPDATE_WORK = "TIMESHEET_UPDATE_WORK"
+const TIMESHEET_UPDATE_WORK_SUCCESS = "TIMESHEET_UPDATE_WORK_SUCCESS"
+const TIMESHEET_UPDATE_WORK_ERROR = "TIMESHEET_UPDATE_WORK_ERROR"
+
+
 // store
 const store = new Vuex.Store({
     state: {
@@ -130,6 +135,23 @@ const store = new Vuex.Store({
                     });
             });
         },
+
+        [TIMESHEET_UPDATE_WORK]: ({commit, dispatch, getters}, work) => {
+            console.log(work);
+            return new Promise((resolve, reject) => {
+                commit(TIMESHEET_UPDATE_WORK);
+                axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
+                axios.put(TIMESHEET_RESOURCE_URL + `${work.id}/`, work)
+                    .then(resp => {
+                        commit(TIMESHEET_UPDATE_WORK_SUCCESS, resp);
+                        resolve(resp);
+                    })
+                    .catch(err => {
+                        commit(TIMESHEET_UPDATE_WORK_ERROR, err);
+                        reject(err);
+                    });
+            });
+        },
     },
     mutations: {
         [AUTH_REQUEST]: state => {
@@ -187,6 +209,17 @@ const store = new Vuex.Store({
         },
         [TIMESHEET_DELETE_WORK_SUCCESS]: (state, resp) => {
             state.appStatus = "work_deleted";
+            state.error = "";
+        },
+        [TIMESHEET_UPDATE_WORK]: state => {
+            state.appStatus = "updating_work";
+        },
+        [TIMESHEET_UPDATE_WORK_ERROR]: (state, err) => {
+            state.appStatus = "work_update_error";
+            state.error = err;
+        },
+        [TIMESHEET_UPDATE_WORK_SUCCESS]: (state, resp) => {
+            state.appStatus = "work_updated";
             state.error = "";
         },
     }
@@ -311,6 +344,19 @@ const Timesheet = Vue.component('timesheet', {
         delete_work: function (work) {
             console.log(work)
             this.$store.dispatch(TIMESHEET_DELETE_WORK, {id: work.id}).then(() => {
+                this.refresh_logged_work()
+            }).catch(err => {
+                console.log(err)
+            });
+        },
+        update_work: function (work) {
+            console.log(work)
+            this.$store.dispatch(TIMESHEET_UPDATE_WORK, {
+                id: work.id,
+                workday: work.workday,
+                description: work.description,
+                duration: work.duration
+            }).then(() => {
                 this.refresh_logged_work()
             }).catch(err => {
                 console.log(err)

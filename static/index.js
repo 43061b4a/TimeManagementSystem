@@ -32,16 +32,18 @@ const TIMESHEET_UPDATE_WORK_ERROR = "TIMESHEET_UPDATE_WORK_ERROR"
 const store = new Vuex.Store({
     state: {
         token: localStorage.getItem('user-token') || '',
+        preferred_working_hours: localStorage.getItem("preferred_working_hours") || '',
         status: '',
         registered: '',
-        appStatus: ''
+        appStatus: '',
     },
     getters: {
         isAuthenticated: state => !!state.token,
         authStatus: state => state.status,
         registerStatus: state => state.registered,
         authToken: state => state.token,
-        appStatus: state => state.appStatus
+        appStatus: state => state.appStatus,
+        preferredWorkingHours: state => state.preferred_working_hours
     },
     actions: {
         [AUTH_REQUEST]: ({commit, dispatch}, user) => {
@@ -50,6 +52,7 @@ const store = new Vuex.Store({
                 axios({url: AUTH_URL, data: user, method: "POST"})
                     .then(resp => {
                         localStorage.setItem("user-token", resp.data.token);
+                        localStorage.setItem("preferred_working_hours", resp.data.preferred_working_hours);
                         axios.defaults.headers.common['Authorization'] = "Token " + resp.data.token
                         commit(AUTH_SUCCESS, resp);
                         resolve(resp);
@@ -64,7 +67,8 @@ const store = new Vuex.Store({
         [AUTH_LOGOUT]: ({commit}) => {
             return new Promise(resolve => {
                 commit(AUTH_LOGOUT);
-                localStorage.removeItem("user-token");
+                localStorage.removeItem("user-token")
+                localStorage.removeItem("preferred_working_hours")
                 resolve();
             });
         },
@@ -160,6 +164,7 @@ const store = new Vuex.Store({
         [AUTH_SUCCESS]: (state, resp) => {
             state.status = "success";
             state.token = resp.data.token;
+            state.preferred_working_hours = resp.data.preferred_working_hours;
         },
         [AUTH_ERROR]: state => {
             state.status = "error";
@@ -312,6 +317,7 @@ const Timesheet = Vue.component('timesheet', {
             description: "",
             duration: null,
             timesheet: [],
+            preferredWorkingHours: this.$store.getters.preferredWorkingHours,
             attributes: [
                 {
                     key: 'today',
@@ -364,7 +370,16 @@ const Timesheet = Vue.component('timesheet', {
         }
     },
     template: '#timesheet-template',
-    computed: {},
+    computed: {
+        highlight_hours: function () {
+            let prefHours = this.$store.getters.preferredWorkingHours
+            let totalHours = 0
+            for (let i = 0; i < this.timesheet.length; i++) {
+                totalHours += this.timesheet[i].duration
+            }
+            return totalHours < prefHours
+        }
+    },
     beforeMount: function () {
         this.refresh_logged_work()
     }

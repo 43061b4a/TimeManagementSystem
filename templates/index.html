@@ -128,6 +128,8 @@
             <h1>
                 Timesheet
             </h1>
+            <small class="text-muted">Your preferred Working Hours: <span
+                    v-once>{{ preferredWorkingHours }}</span></small>
             <hr/>
             <form @submit.prevent="log_work">
                 <div class="form-group">
@@ -144,7 +146,8 @@
                     <div class="form-row">
                         <div class="form-group col-md-3">
                             <label for="duration" class="text-muted">Duration</label>
-                            <input required type="text" v-model="duration" class="form-control" placeholder="8">
+                            <input required type="text" v-model="duration" class="form-control" placeholder="8"
+                                   v-bind:class="{ 'bg-danger': highlight_hours, 'bg-success':!highlight_hours }">
                         </div>
                         <div class="form-group col-md-7">
                             <label for="description" class="text-muted">Description</label>
@@ -163,9 +166,9 @@
                     <template v-for="log in timesheet">
                         <div class="form-row">
                             <div class="form-group col-md-3">
-
                                 <input required type="text" class="form-control align-top" placeholder="8"
-                                       v-model="log.duration">
+                                       v-model="log.duration"
+                                       v-bind:class="{ 'bg-danger': highlight_hours, 'bg-success':!highlight_hours }">
                             </div>
                             <div class="form-group col-md-7">
                                 <input required type="text" class="form-control align-top" placeholder="8"

@@ -20,10 +20,17 @@ class WorkList(generics.ListCreateAPIView):
 
     def get_queryset(self):
         current_user = User.objects.get(username=self.request.user)
+        workday = self.request.GET.get('workday', '')
         if current_user.is_superuser or current_user.is_staff:
-            return Work.objects.all()
+            if workday:
+                return Work.objects.filter(workday=workday).order_by('-created_at')
+            else:
+                return Work.objects.all().order_by('-created_at')
         else:
-            return Work.objects.filter(owner=current_user)
+            if workday:
+                return Work.objects.filter(owner=current_user, workday=workday).order_by('-created_at')
+            else:
+                return Work.objects.filter(owner=current_user).order_by('-created_at')
 
     def perform_create(self, serializer):
         current_user = User.objects.get(username=self.request.user)

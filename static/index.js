@@ -15,18 +15,28 @@ const TIMESHEET_LOG_WORK = "TIMESHEET_LOG_WORK"
 const TIMESHEET_LOG_WORK_SUCCESS = "TIMESHEET_LOG_WORK_SUCCESS"
 const TIMESHEET_LOG_WORK_ERROR = "TIMESHEET_LOG_WORK_ERROR"
 
+const TIMESHEET_LOAD = "TIMESHEET_LOAD"
+const TIMESHEET_LOAD_SUCCESS = "TIMESHEET_LOAD_SUCCESS"
+const TIMESHEET_LOAD_ERROR = "TIMESHEET_LOAD_ERROR"
+
+const TIMESHEET_DELETE_WORK = "TIMESHEET_DELETE_WORK"
+const TIMESHEET_DELETE_WORK_SUCCESS = "TIMESHEET_DELETE_WORK_SUCCESS"
+const TIMESHEET_DELETE_WORK_ERROR = "TIMESHEET_DELETE_WORK_ERROR"
+
 // store
 const store = new Vuex.Store({
     state: {
         token: localStorage.getItem('user-token') || '',
         status: '',
         registered: '',
+        appStatus: ''
     },
     getters: {
         isAuthenticated: state => !!state.token,
         authStatus: state => state.status,
         registerStatus: state => state.registered,
-        authToken: state => state.token
+        authToken: state => state.token,
+        appStatus: state => state.appStatus
     },
     actions: {
         [AUTH_REQUEST]: ({commit, dispatch}, user) => {
@@ -34,7 +44,7 @@ const store = new Vuex.Store({
                 commit(AUTH_REQUEST);
                 axios({url: AUTH_URL, data: user, method: "POST"})
                     .then(resp => {
-                        localStorage.setItem("user-token", resp.token);
+                        localStorage.setItem("user-token", resp.data.token);
                         axios.defaults.headers.common['Authorization'] = "Token " + resp.data.token
                         commit(AUTH_SUCCESS, resp);
                         resolve(resp);
@@ -86,6 +96,40 @@ const store = new Vuex.Store({
                     });
             });
         },
+
+        [TIMESHEET_LOAD]: ({commit, dispatch, getters}, workday) => {
+            console.log(workday);
+            return new Promise((resolve, reject) => {
+                commit(TIMESHEET_LOAD);
+                axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
+                axios.get(TIMESHEET_RESOURCE_URL + `?workday=${workday.workday}`)
+                    .then(resp => {
+                        commit(TIMESHEET_LOAD_SUCCESS, resp);
+                        resolve(resp);
+                    })
+                    .catch(err => {
+                        commit(TIMESHEET_LOAD_ERROR, err);
+                        reject(err);
+                    });
+            });
+        },
+
+        [TIMESHEET_DELETE_WORK]: ({commit, dispatch, getters}, id) => {
+            console.log(id);
+            return new Promise((resolve, reject) => {
+                commit(TIMESHEET_LOAD);
+                axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
+                axios.delete(TIMESHEET_RESOURCE_URL + `${id.id}/`)
+                    .then(resp => {
+                        commit(TIMESHEET_DELETE_WORK_SUCCESS, resp);
+                        resolve(resp);
+                    })
+                    .catch(err => {
+                        commit(TIMESHEET_DELETE_WORK_ERROR, err);
+                        reject(err);
+                    });
+            });
+        },
     },
     mutations: {
         [AUTH_REQUEST]: state => {
@@ -113,14 +157,36 @@ const store = new Vuex.Store({
             state.registration_errors = "";
         },
         [TIMESHEET_LOG_WORK]: state => {
-            state.status = "LoggingWork";
+            state.appStatus = "logging_work";
         },
         [TIMESHEET_LOG_WORK_ERROR]: (state, err) => {
-            state.state = "error";
+            state.appStatus = "work_log_error";
             state.error = err;
         },
         [TIMESHEET_LOG_WORK_SUCCESS]: (state, resp) => {
-            state.state = "registered";
+            state.appStatus = "work_logged";
+            state.error = "";
+        },
+        [TIMESHEET_LOAD]: state => {
+            state.appStatus = "loading_timesheet_data";
+        },
+        [TIMESHEET_LOAD_ERROR]: (state, err) => {
+            state.appStatus = "loading_timesheet_data_error";
+            state.error = err;
+        },
+        [TIMESHEET_LOAD_SUCCESS]: (state, resp) => {
+            state.appStatus = "loading_timesheet_data_error_success";
+            state.error = "";
+        },
+        [TIMESHEET_DELETE_WORK]: state => {
+            state.appStatus = "deleting_work";
+        },
+        [TIMESHEET_DELETE_WORK_ERROR]: (state, err) => {
+            state.appStatus = "work_delete_error";
+            state.error = err;
+        },
+        [TIMESHEET_DELETE_WORK_SUCCESS]: (state, resp) => {
+            state.appStatus = "work_deleted";
             state.error = "";
         },
     }
@@ -209,9 +275,10 @@ const RegisterStatus = Vue.component('register-status', {
 const Timesheet = Vue.component('timesheet', {
     data() {
         return {
-            workday: new Date(),
+            workday: new Date(new Date().setHours(0, 0, 0, 0)),
             description: "",
             duration: null,
+            timesheet: [],
             attributes: [
                 {
                     key: 'today',
@@ -221,25 +288,40 @@ const Timesheet = Vue.component('timesheet', {
         };
     },
     methods: {
-        date_change: function () {
-            const selected_date = new Date(this.workday);
-            console.log(selected_date.toISOString());
+        refresh_logged_work: function () {
+            let {workday} = this
+            workday = workday.toISOString().substring(0, 10);
+            this.$store.dispatch(TIMESHEET_LOAD, {workday}).then((resp) => {
+                this.timesheet = resp.data
+            }).catch(err => {
+                console.log(err)
+            });
         },
         log_work: function () {
             let {workday, description, duration} = this
             workday = workday.toISOString().substring(0, 10);
             this.$store.dispatch(TIMESHEET_LOG_WORK, {workday, description, duration}).then(() => {
-                this.update_logged_work()
+                this.refresh_logged_work()
+                this.description = ""
+                this.duration = null
             }).catch(err => {
                 console.log(err)
             });
         },
-        update_logged_work: function () {
-
+        delete_work: function (work) {
+            console.log(work)
+            this.$store.dispatch(TIMESHEET_DELETE_WORK, {id: work.id}).then(() => {
+                this.refresh_logged_work()
+            }).catch(err => {
+                console.log(err)
+            });
         }
     },
     template: '#timesheet-template',
     computed: {},
+    beforeMount: function () {
+        this.refresh_logged_work()
+    }
 });
 // router
 const routes = [

@@ -26,9 +26,9 @@ favicon_view = RedirectView.as_view(url='/static/images/favicon.ico', permanent=
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
-    path('', TemplateView.as_view(template_name='index.html')),
     path('api/', include('timesheets.urls')),
     path('api-auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^favicon\.ico$', favicon_view),
-    url(r'api/api-token-auth/', CustomAuthToken.as_view(), name='api_token_auth')
+    url(r'api/api-token-auth/', CustomAuthToken.as_view(), name='api_token_auth'),
+    url(r'^.*$', TemplateView.as_view(template_name="index.html")),
 ]

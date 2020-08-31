@@ -17,7 +17,7 @@
     <!-- Content -->
     <div id="app">
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-            <a class="navbar-brand" href="/">Time Management System</a>
+            <router-link v-bind:to="'report'" class="navbar-brand">Time Management System</router-link>
             <ul class="navbar-nav ml-auto" v-if="isAuthenticated">
                 <li>
                     <router-link to="/timesheet" class="btn btn-primary my-2 shadow">Timesheet</router-link>
@@ -120,6 +120,7 @@
         </form>
     </div>
 </template>
+
 {% verbatim %}
 <template id="timesheet-template">
     <div class="timesheet">
@@ -128,69 +129,111 @@
             <h1>
                 Timesheet
             </h1>
-            <small class="text-muted">Your Preferred Working Hours: <span v-once>{{ preferredWorkingHours }}</span></small>
+            <small class="text-muted">Your Preferred Working Hours: <span
+                    v-once>{{ preferredWorkingHours }}</span></small>
             <hr/>
-            <form @submit.prevent="log_work">
-                <div class="form-group">
-                    <v-date-picker
-                            v-model='workday'
-                            @input="refresh_logged_work"
-                            :input-props='{
-                                    class: "form-control",
-                                    readonly: true
-                                  }'
-                    />
-                </div>
-                <div class="time_entry">
-                    <div class="form-row">
-                        <div class="form-group col-md-3">
-                            <label for="duration" class="text-muted">Duration</label>
-                            <input required type="text" v-model="duration" class="form-control" placeholder="8"
-                                   v-bind:class="{ 'bg-danger': highlight_hours, 'bg-success':!highlight_hours }">
-                        </div>
-                        <div class="form-group col-md-7">
-                            <label for="description" class="text-muted">Description</label>
-                            <input required type="text" v-model="description" class="form-control"
-                                   placeholder="Assembling engine">
-                        </div>
-                        <div class="form-group col-md-2">
-                            <br/>
-                            <button type="submit" name="work_log" text="Register"
-                                    class="form-control btn btn-primary my-2">Log Work
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </form>
-            <div class="time_logs">
-                <template v-for="log in timesheet">
-                    <div class="form-row">
-                        <div class="form-group col-md-3">
-                            <input required type="text" class="form-control align-top" placeholder="8"
-                                   v-model="log.duration"
-                                   v-bind:class="{ 'bg-danger': highlight_hours, 'bg-success':!highlight_hours }">
-                        </div>
-                        <div class="form-group col-md-7">
-                            <input required type="text" class="form-control align-top" placeholder="8"
-                                   v-model="log.description">
-                        </div>
-                        <div class="form-group col-md-1">
-                            <button type="button" name="work_update" text="Register"
-                                    class="form-control btn btn-info align-top" @click="update_work(log)">Update
-                            </button>
-                        </div>
-                        <div class="form-group col-md-1">
-                            <button type="button" name="work_update" text="Register"
-                                    class="form-control btn btn-danger align-top" @click="delete_work(log)">Delete
-                            </button>
-                        </div>
-                    </div>
-                </template>
+        </div>
+        <form @submit.prevent="log_work">
+            <div class="form-group">
+                <v-date-picker v-model='workday'
+                               @input="refresh_logged_work"
+                               :input-props='{ class: "form-control", readonly: true }'></v-date-picker>
             </div>
+            <div class="time_entry">
+                <div class="form-row">
+                    <div class="form-group col-md-1">
+                        <label for="duration" class="text-muted">Duration</label>
+                        <input required type="text" v-model="duration" class="form-control" placeholder="8"
+                               v-bind:class="{ 'bg-danger': highlight_hours, 'bg-success':!highlight_hours }">
+                    </div>
+                    <div class="form-group col-md-9">
+                        <label for="description" class="text-muted">Description</label>
+                        <input required type="text" v-model="description" class="form-control"
+                               placeholder="Assembling engine">
+                    </div>
+                    <div class="form-group col-md-2">
+                        <br/>
+                        <button type="submit" name="work_log" text="Register"
+                                class="form-control btn btn-primary my-2">Log Work
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+        <div class="time_logs">
+            <template v-for="log in timesheet">
+                <div class="form-row">
+                    <div class="form-group col-md-1">
+                        <input required type="text" class="form-control align-top" placeholder="8"
+                               v-model="log.duration"
+                               v-bind:class="{ 'bg-danger': highlight_hours, 'bg-success':!highlight_hours }">
+                    </div>
+                    <div class="form-group col-md-9">
+                        <input required type="text" class="form-control align-top" placeholder="8"
+                               v-model="log.description">
+                    </div>
+                    <div class="form-group col-md-1">
+                        <button type="button" name="work_update" text="Register"
+                                class="form-control btn btn-info align-top" @click="update_work(log)">Update
+                        </button>
+                    </div>
+                    <div class="form-group col-md-1">
+                        <button type="button" name="work_update" text="Register"
+                                class="form-control btn btn-danger align-top" @click="delete_work(log)">Delete
+                        </button>
+                    </div>
+                </div>
+            </template>
         </div>
     </div>
 </template>
 {% endverbatim %}
+
+<template id="report-template">
+    <div class="timesheet-report">
+        <br/>
+        <div class="page-header">
+            <h1>
+                Timesheet Report
+            </h1>
+            <hr/>
+        </div>
+        <form>
+            <div class="form-row align-items-center">
+                <div class="col-auto">
+                    <label class="sr-only" for="inlineFormInput">Startdate</label>
+                    <div class="input-group mb-2">
+                        <v-date-picker v-model='startdate'
+                                       :input-props='{ class: "form-control", readonly: true }'></v-date-picker>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <label class="sr-only" for="inlineFormInputGroup">EndDate</label>
+                    <div class="input-group mb-2">
+                        <v-date-picker v-model='enddate'
+                                       :input-props='{ class: "form-control", readonly: true }'></v-date-picker>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary mb-2">Generate Report</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</template>
+
+
+<template id="NotFoundComponent-template">
+    <div class="NotFoundComponent">
+        <br/>
+        <div class="page-header">
+            <h1>
+                Sorry, this page not found.
+            </h1>
+            <hr/>
+        </div>
+    </div>
+</template>
 
 <script src="{% static "index.js" %}"></script>
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->

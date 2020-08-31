@@ -10,8 +10,13 @@ from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework.views import APIView
 
-from timesheets.models import Work
+from timesheets.models import Work, Profile
 from timesheets.serializers import WorkSerializer, UserSerializer, UserRootSerializer
+
+
+def set_if_not_none(mapping, key, value):
+    if value is not None:
+        mapping[key] = value
 
 
 class WorkList(generics.ListCreateAPIView):
@@ -20,22 +25,32 @@ class WorkList(generics.ListCreateAPIView):
 
     def get_queryset(self):
         current_user = User.objects.get(username=self.request.user)
-        workday = self.request.GET.get('workday', '')
-        if current_user.is_superuser or current_user.is_staff:
-            if workday:
-                return Work.objects.filter(workday=workday).order_by('-created_at')
-            else:
-                return Work.objects.all().order_by('-created_at')
+        workday = self.request.GET.get('workday', None)
+        startdate = self.request.GET.get('startdate', None)
+        enddate = self.request.GET.get('enddate', None)
+        username = self.request.GET.get('username', None)
+
+        filter_params = {}
+        if current_user.is_superuser is False and current_user.is_staff is False:
+            set_if_not_none(filter_params, 'owner', current_user)
         else:
-            if workday:
-                return Work.objects.filter(owner=current_user, workday=workday).order_by('-created_at')
-            else:
-                return Work.objects.filter(owner=current_user).order_by('-created_at')
+            if username is not None:
+                current_user = User.objects.get(username=username)
+            set_if_not_none(filter_params, 'owner', current_user)
+
+        set_if_not_none(filter_params, 'workday__gte', startdate)
+        set_if_not_none(filter_params, 'workday__lte', enddate)
+        set_if_not_none(filter_params, 'workday', workday)
+
+        return Work.objects.filter(**filter_params).order_by('-created_at')
 
     def perform_create(self, serializer):
         current_user = User.objects.get(username=self.request.user)
         if current_user.is_superuser or current_user.is_staff:
-            serializer.save()
+            given_user = self.request.GET.get('username', None)
+            if given_user:
+                current_user = User.objects.get(username=given_user)
+            serializer.save(owner=current_user)
         else:
             serializer.save(owner=self.request.user)
 
@@ -116,6 +131,7 @@ class CustomAuthToken(ObtainAuthToken):
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
+        profile, created = Profile.objects.get_or_create(owner=user)
         return Response({
             'token': token.key,
             'user_id': user.pk,
@@ -123,7 +139,7 @@ class CustomAuthToken(ObtainAuthToken):
             'email': user.email,
             'is_staff': user.is_staff,
             'is_superuser': user.is_staff,
-            'preferred_working_hours': user.profile.preferred_working_hours
+            'preferred_working_hours': profile.preferred_working_hours
         })
 
 

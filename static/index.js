@@ -7,6 +7,7 @@ const AUTH_REQUEST = "AUTH_REQUEST";
 const AUTH_SUCCESS = "AUTH_SUCCESS";
 const AUTH_ERROR = "AUTH_ERROR";
 const AUTH_LOGOUT = "AUTH_LOGOUT";
+
 const AUTH_REGISTER = "AUTH_REGISTER";
 const AUTH_REGISTER_SUCCESS = "AUTH_REGISTER_SUCCESS";
 const AUTH_REGISTER_ERROR = "AUTH_REGISTER_ERROR";
@@ -248,7 +249,7 @@ const Login = Vue.component('login', {
         login: function () {
             const {username, password} = this
             this.$store.dispatch(AUTH_REQUEST, {username, password}).then(() => {
-                this.$router.push('/timesheet')
+                this.$router.push('/report')
             }).catch(err => {
                 console.log(err)
             });
@@ -384,12 +385,43 @@ const Timesheet = Vue.component('timesheet', {
         this.refresh_logged_work()
     }
 });
+
+Date.prototype.addDays = function (days) {
+    var date = new Date(this.valueOf());
+    date.setDate(date.getDate() + days);
+    return date;
+}
+const Report = Vue.component('report', {
+    data() {
+        return {
+            startdate: new Date(new Date().addDays(-6).setHours(0, 0, 0, 0)),
+            enddate: new Date(new Date().addDays(2).setHours(0, 0, 0, 0)),
+        };
+    },
+    template: '#report-template',
+    computed: {},
+});
+
+const NotFoundComponent = Vue.component('NotFoundComponent', {
+    data() {
+        return {};
+    },
+    template: '#NotFoundComponent-template',
+    computed: {},
+});
+
+
 // router
 const routes = [
     {
         path: '/login',
         name: 'login',
         component: Login
+    },
+    {
+        path: '/',
+        redirect: 'report',
+        component: Report
     },
     {
         path: '/register',
@@ -409,8 +441,23 @@ const routes = [
     {
         path: '/timesheet',
         name: 'timesheet',
-        component: Timesheet
+        component: Timesheet,
+        meta: {
+            requiresAuth: true
+        }
     },
+    {
+        path: '/report',
+        name: 'report',
+        component: Report,
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
+        path: '*',
+        component: NotFoundComponent
+    }
 ]
 
 const router = new VueRouter({
@@ -418,6 +465,19 @@ const router = new VueRouter({
     routes: routes,
 })
 
+router.beforeEach((to, from, next) => {
+    if (to.matched.some(record => record.meta.requiresAuth)) {
+        // this route requires auth, check if logged in
+        // if not, redirect to login page.
+        if (!store.getters.isAuthenticated) {
+            next({name: 'Login'})
+        } else {
+            next() // go to wherever I'm going
+        }
+    } else {
+        next() // does not require auth, make sure to always call next()!
+    }
+})
 
 // app
 const mainApp = new Vue({

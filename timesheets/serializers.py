@@ -28,12 +28,15 @@ class UserRootSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
 
     def update(self, instance, validated_data):
+        if instance.is_superuser:
+            instance.is_staff = validated_data.pop('is_staff')
+            instance.is_superuser = validated_data.pop('is_superuser')
+
         instance.username = validated_data.pop('username')
-        instance.is_staff = validated_data.pop('is_staff')
         instance.email = validated_data.pop('email')
-        instance.is_superuser = validated_data.pop('is_superuser')
         instance.set_password(validated_data.pop('password'))
         instance.save()
+
         if 'profile' in validated_data and validated_data['profile']['preferred_working_hours'] > 0:
             instance.profile, created = Profile.objects.get_or_create(owner=instance)
             instance.profile.preferred_working_hours = int(validated_data['profile']['preferred_working_hours'])

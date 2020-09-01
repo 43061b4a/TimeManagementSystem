@@ -37,6 +37,9 @@ const store = new Vuex.Store({
     state: {
         token: localStorage.getItem('user-token') || '',
         preferred_working_hours: localStorage.getItem("preferred_working_hours") || '',
+        email: localStorage.getItem("email") || '',
+        username: localStorage.getItem("username") || '',
+        userid: localStorage.getItem("userid") || '',
         status: '',
         registered: '',
         appStatus: '',
@@ -45,9 +48,12 @@ const store = new Vuex.Store({
         isAuthenticated: state => !!state.token,
         authStatus: state => state.status,
         registerStatus: state => state.registered,
-        authToken: state => state.token,
         appStatus: state => state.appStatus,
-        preferredWorkingHours: state => state.preferred_working_hours
+        authToken: state => state.token,
+        preferredWorkingHours: state => state.preferred_working_hours,
+        email: state => state.email,
+        username: state => state.username,
+        userid: state => state.userid,
     },
     actions: {
         [AUTH_REQUEST]: ({commit, dispatch}, user) => {
@@ -55,8 +61,13 @@ const store = new Vuex.Store({
                 commit(AUTH_REQUEST);
                 axios({url: AUTH_URL, data: user, method: "POST"})
                     .then(resp => {
+                        console.log(resp)
                         localStorage.setItem("user-token", resp.data.token);
                         localStorage.setItem("preferred_working_hours", resp.data.preferred_working_hours);
+                        localStorage.setItem("email", resp.data.email);
+                        localStorage.setItem("username", resp.data.username);
+                        localStorage.setItem("userid", resp.data.user_id);
+
                         axios.defaults.headers.common['Authorization'] = "Token " + resp.data.token
                         commit(AUTH_SUCCESS, resp);
                         resolve(resp);
@@ -73,6 +84,9 @@ const store = new Vuex.Store({
                 commit(AUTH_LOGOUT);
                 localStorage.removeItem("user-token")
                 localStorage.removeItem("preferred_working_hours")
+                localStorage.removeItem("email");
+                localStorage.removeItem("username");
+                localStorage.removeItem("userid");
                 resolve();
             });
         },
@@ -188,6 +202,9 @@ const store = new Vuex.Store({
             state.status = "success";
             state.token = resp.data.token;
             state.preferred_working_hours = resp.data.preferred_working_hours;
+            state.email = resp.data.email;
+            state.username = resp.data.username;
+            state.userid = resp.data.user_id;
         },
         [AUTH_ERROR]: state => {
             state.status = "error";
@@ -474,11 +491,36 @@ const Report = Vue.component('report', {
     }
 });
 
+const Profile = Vue.component('profile', {
+    data() {
+        return {
+            username: this.$store.getters.username,
+            password: "",
+            email: this.$store.getters.email,
+            preferred_working_hours: this.$store.getters.preferredWorkingHours,
+        };
+    },
+    template: '#profile-template',
+    methods: {
+        update_profile: function () {
+            let {username, password, email, preferred_working_hours} = this
+            console.log({username, password, email, preferred_working_hours})
+        }
+    },
+    computed: {
+        registerError() {
+            // return this.$store.getters.registerStatus === 'error'
+        }
+    },
+});
+
+
 const NotFoundComponent = Vue.component('NotFoundComponent', {
     data() {
         return {};
     },
     template: '#NotFoundComponent-template',
+    methods: {},
     computed: {},
 });
 
@@ -522,6 +564,14 @@ const routes = [
         path: '/report',
         name: 'report',
         component: Report,
+        meta: {
+            requiresAuth: true
+        }
+    },
+    {
+        path: '/profile',
+        name: 'profile',
+        component: Profile,
         meta: {
             requiresAuth: true
         }

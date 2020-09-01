@@ -11,6 +11,11 @@
           integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
 
     <title>Time Management System</title>
+    <style type="text/css">
+        .router-link-active {
+            color: #f2f2f2 !important;
+        }
+    </style>
 </head>
 <body class="bg-light">
 <div class="bg-white container pb-1">
@@ -19,8 +24,11 @@
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
             <router-link v-bind:to="'report'" class="navbar-brand">Time Management System</router-link>
             <ul class="navbar-nav ml-auto" v-if="isAuthenticated">
+                <li class="nav-item">
+                    <router-link to="/timesheet" class="nav-link my-2">My Timesheet</router-link>
+                </li>
                 <li>
-                    <router-link to="/timesheet" class="btn btn-primary my-2 shadow">Timesheet</router-link>
+                    <router-link to="/profile" class="nav-link my-2">My Profile</router-link>
                 </li>
                 <li>
                     <router-link to="/logout" class="btn btn-warning my-2">Logout</router-link>
@@ -244,6 +252,45 @@
 </template>
 
 {% endverbatim %}
+
+<template id="profile-template">
+    <div class="profile">
+        <div class="page-header my-2">
+            <h1>
+                Profile
+            </h1>
+        </div>
+
+        <form @submit.prevent="update_profile">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input required v-model="email" class="form-control" placeholder="jim@gmail.com">
+            </div>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input required v-model="username" type="text" class="form-control" placeholder="jim">
+            </div>
+            <div class="form-group">
+                <label for="password">Password <span
+                        class="text-muted small">Leave this blank if you don't wnat to change your password</span></label>
+                <input v-model="password" type="password" class="form-control" placeholder="*****">
+            </div>
+            <div class="form-group">
+                <label for="preferred_working_hours">Preferred Working Hours</label>
+                <input required v-model="preferred_working_hours" type="text"
+                       class="form-control" placeholder="8">
+            </div>
+            <div class="register-failed" v-if="registerError">
+                Profile update failed. Please try again.
+            </div>
+            <div class="form-group">
+                <button type="submit" text="Register"
+                        class="btn btn-primary my-2">Update
+                </button>
+            </div>
+        </form>
+    </div>
+</template>
 
 <template id="NotFoundComponent-template">
     <div class="NotFoundComponent">

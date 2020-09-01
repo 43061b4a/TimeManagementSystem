@@ -13,7 +13,7 @@
     <title>Time Management System</title>
 </head>
 <body class="bg-light">
-<div class="bg-white container">
+<div class="bg-white container pb-1">
     <!-- Content -->
     <div id="app">
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
@@ -28,7 +28,7 @@
             </ul>
         </nav>
         <section class="jumbotron text-center" v-if="!isAuthenticated">
-            <div class="container">
+            <div class="container my-2">
                 <h1 class="jumbotron-heading">Time Management System</h1>
                 <p class="lead text-muted">Please login or register to continue.</p>
                 <p>
@@ -39,7 +39,6 @@
         </section>
         <router-view></router-view>
     </div>
-    <hr/>
 </div>
 
 <!-- Vue.js -->

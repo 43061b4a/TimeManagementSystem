@@ -28,6 +28,9 @@ const TIMESHEET_UPDATE_WORK = "TIMESHEET_UPDATE_WORK"
 const TIMESHEET_UPDATE_WORK_SUCCESS = "TIMESHEET_UPDATE_WORK_SUCCESS"
 const TIMESHEET_UPDATE_WORK_ERROR = "TIMESHEET_UPDATE_WORK_ERROR"
 
+const REPORT_LOAD = "REPORT_LOAD"
+const REPORT_LOAD_SUCCESS = "REPORT_LOAD_SUCCESS"
+const REPORT_LOAD_ERROR = "REPORT_LOAD_ERROR"
 
 // store
 const store = new Vuex.Store({
@@ -157,6 +160,25 @@ const store = new Vuex.Store({
                     });
             });
         },
+
+        [REPORT_LOAD]: ({commit, dispatch, getters}, dates) => {
+            const {start, end} = dates
+            console.log(dates)
+            console.log(start, end)
+            return new Promise((resolve, reject) => {
+                commit(REPORT_LOAD);
+                axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
+                axios.get(TIMESHEET_RESOURCE_URL + `?startdate=${start}&enddate=${end}&sort=workday`)
+                    .then(resp => {
+                        commit(REPORT_LOAD_SUCCESS, resp);
+                        resolve(resp);
+                    })
+                    .catch(err => {
+                        commit(REPORT_LOAD_ERROR, err);
+                        reject(err);
+                    });
+            });
+        },
     },
     mutations: {
         [AUTH_REQUEST]: state => {
@@ -203,7 +225,7 @@ const store = new Vuex.Store({
             state.error = err;
         },
         [TIMESHEET_LOAD_SUCCESS]: (state, resp) => {
-            state.appStatus = "loading_timesheet_data_error_success";
+            state.appStatus = "loading_timesheet_data_success";
             state.error = "";
         },
         [TIMESHEET_DELETE_WORK]: state => {
@@ -226,6 +248,17 @@ const store = new Vuex.Store({
         },
         [TIMESHEET_UPDATE_WORK_SUCCESS]: (state, resp) => {
             state.appStatus = "work_updated";
+            state.error = "";
+        },
+        [REPORT_LOAD]: state => {
+            state.appStatus = "loading_report_data";
+        },
+        [REPORT_LOAD_ERROR]: (state, err) => {
+            state.appStatus = "loading_report_data_error";
+            state.error = err;
+        },
+        [REPORT_LOAD_SUCCESS]: (state, resp) => {
+            state.appStatus = "loading_report_data_success";
             state.error = "";
         },
     }
@@ -396,10 +429,49 @@ const Report = Vue.component('report', {
         return {
             startdate: new Date(new Date().addDays(-6).setHours(0, 0, 0, 0)),
             enddate: new Date(new Date().addDays(2).setHours(0, 0, 0, 0)),
+            timesheet: []
         };
+    },
+    methods: {
+        refresh_report: function () {
+            let {startdate, enddate} = this
+            let start = startdate.toISOString().substring(0, 10);
+            let end = enddate.toISOString().substring(0, 10);
+            console.log(start, end)
+            this.$store.dispatch(REPORT_LOAD, {start, end}).then((resp) => {
+
+                grouped_data = {}
+                for (let i = 0; i < resp.data.length; i++) {
+                    if (!grouped_data[resp.data[i].workday]) {
+                        grouped_data[resp.data[i].workday] = {
+                            workday: resp.data[i].workday,
+                            totalHours: resp.data[i].duration,
+                            descriptionCombined: [resp.data[i].description]
+                        }
+                    } else {
+                        const {workday, totalHours, descriptionCombined} = grouped_data[resp.data[i].workday];
+                        descriptionCombined.push(resp.data[i].description)
+                        grouped_data[resp.data[i].workday] = {
+                            workday,
+                            totalHours: resp.data[i].duration + totalHours,
+                            descriptionCombined: descriptionCombined
+                        }
+                    }
+                    const {totalHours, descriptionCombined} = grouped_data[resp.data[i].workday];
+                    console.log(totalHours, descriptionCombined)
+                }
+                this.timesheet = grouped_data
+                console.log(start, end, grouped_data)
+            }).catch(err => {
+                console.log(err)
+            });
+        }
     },
     template: '#report-template',
     computed: {},
+    beforeMount: function () {
+        this.refresh_report()
+    }
 });
 
 const NotFoundComponent = Vue.component('NotFoundComponent', {

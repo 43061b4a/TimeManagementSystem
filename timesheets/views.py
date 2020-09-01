@@ -29,6 +29,7 @@ class WorkList(generics.ListCreateAPIView):
         startdate = self.request.GET.get('startdate', None)
         enddate = self.request.GET.get('enddate', None)
         username = self.request.GET.get('username', None)
+        sort_key = self.request.GET.get('sort', None)
 
         filter_params = {}
         if current_user.is_superuser is False and current_user.is_staff is False:
@@ -42,7 +43,10 @@ class WorkList(generics.ListCreateAPIView):
         set_if_not_none(filter_params, 'workday__lte', enddate)
         set_if_not_none(filter_params, 'workday', workday)
 
-        return Work.objects.filter(**filter_params).order_by('-created_at')
+        if sort_key:
+            return Work.objects.filter(**filter_params).order_by(sort_key)
+        else:
+            return Work.objects.filter(**filter_params).order_by('-created_at')
 
     def perform_create(self, serializer):
         current_user = User.objects.get(username=self.request.user)

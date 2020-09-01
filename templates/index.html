@@ -187,7 +187,7 @@
         </div>
     </div>
 </template>
-{% endverbatim %}
+
 
 <template id="report-template">
     <div class="timesheet-report">
@@ -198,7 +198,7 @@
             </h1>
             <hr/>
         </div>
-        <form>
+        <form @submit.prevent="refresh_report">
             <div class="form-row align-items-center">
                 <div class="col-auto">
                     <label class="sr-only" for="inlineFormInput">Startdate</label>
@@ -219,9 +219,31 @@
                 </div>
             </div>
         </form>
+        <div>
+            <template v-for="log in timesheet">
+                <div class="card my-1">
+                    <h5 class="card-header py-1">
+                        <b>Date:</b> {{ log.workday }}
+                    </h5>
+                    <div class="card-body py-1">
+                        <div class="card-title my-0"><b>Total Time:</b> {{ log.totalHours }}</div>
+                        <div class="card-text"><b>Notes:</b>
+                            <ul>
+                                <template v-for="desc in log.descriptionCombined">
+                                    <li>
+                                        {{ desc }}
+                                    </li>
+                                </template>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </template>
+        </div>
     </div>
 </template>
 
+{% endverbatim %}
 
 <template id="NotFoundComponent-template">
     <div class="NotFoundComponent">

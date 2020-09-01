@@ -37,6 +37,10 @@ const PROFILE_UPDATE = "PROFILE_UPDATE"
 const PROFILE_UPDATE_SUCCESS = "PROFILE_UPDATE_SUCCESS"
 const PROFILE_UPDATE_ERROR = "PROFILE_UPDATE_ERROR"
 
+const AUTH_DELETE = "AUTH_DELETE";
+const AUTH_DELETE_SUCCESS = "AUTH_DELETE_SUCCESS";
+const AUTH_DELETE_ERROR = "AUTH_DELETE_ERROR";
+
 // store
 const store = new Vuex.Store({
     state: {
@@ -224,6 +228,27 @@ const store = new Vuex.Store({
                     });
             });
         },
+
+        [AUTH_DELETE]: ({commit, dispatch, getters}, user) => {
+            return new Promise((resolve, reject) => {
+                commit(AUTH_DELETE);
+                axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
+                axios.delete(USERS_RESOURCE_URL + `${getters.userid}/`, user)
+                    .then(resp => {
+                        commit(AUTH_DELETE_SUCCESS, resp);
+                        localStorage.removeItem("preferred_working_hours");
+                        localStorage.removeItem("email");
+                        localStorage.removeItem("username");
+                        localStorage.removeItem("user-token");
+                        localStorage.removeItem("userid");
+                        resolve(resp);
+                    })
+                    .catch(err => {
+                        commit(AUTH_DELETE_ERROR, err);
+                        reject(err);
+                    });
+            });
+        },
     },
     mutations: {
         [AUTH_REQUEST]: state => {
@@ -322,6 +347,22 @@ const store = new Vuex.Store({
             state.preferred_working_hours = resp.data.profile.preferred_working_hours;
             state.email = resp.data.email;
             state.username = resp.data.username;
+        },
+        [AUTH_DELETE]: state => {
+            state.appStatus = "deleting_auth";
+        },
+        [AUTH_DELETE_ERROR]: (state, err) => {
+            state.appStatus = "deleting_auth_error";
+            state.error = err;
+        },
+        [AUTH_DELETE_SUCCESS]: (state, resp) => {
+            state.appStatus = "auth_deleted";
+            state.error = "";
+            state.preferred_working_hours = "";
+            state.email = "";
+            state.username = "";
+            state.token = "";
+            state.userid = "";
         },
     }
 })
@@ -560,6 +601,15 @@ const Profile = Vue.component('profile', {
             }).catch(err => {
                 console.log(err)
             });
+        },
+        delete_user: function () {
+            if (confirm("Do you really want to delete?")) {
+                this.$store.dispatch(AUTH_DELETE, {}).then(() => {
+                    this.$router.push('/logout')
+                }).catch(err => {
+                    console.log(err.response.data)
+                });
+            }
         }
     },
     computed: {

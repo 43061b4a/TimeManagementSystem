@@ -82,14 +82,14 @@
 </template>
 
 <template id="logout-template">
-    <div class="logout">
+    <div class="logout alert alert-success">
         Successfully logged out.
     </div>
 </template>
 
 <template id="register-status-template">
     <div class="registration-status">
-        <div class="register-success" v-if="isRegistered">
+        <div class="register-success alert alert-success" v-if="isRegistered">
             Successfully registered. Please login to continue.
         </div>
     </div>
@@ -288,6 +288,9 @@
             <div class="form-group">
                 <button type="submit" text="Register"
                         class="btn btn-primary my-2">Update
+                </button>
+                <button type="button" text="Register" @click="delete_user()"
+                        class="btn btn-danger my-2">Delete
                 </button>
             </div>
         </form>

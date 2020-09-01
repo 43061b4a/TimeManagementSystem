@@ -190,12 +190,10 @@
 
 <template id="report-template">
     <div class="timesheet-report">
-        <br/>
-        <div class="page-header">
+        <div class="page-header my-2">
             <h1>
                 Timesheet Report
             </h1>
-            <hr/>
         </div>
         <form @submit.prevent="refresh_report">
             <div class="form-row align-items-center">
@@ -219,6 +217,9 @@
             </div>
         </form>
         <div>
+            <div class="text-warning py-2" v-if="Object.keys(timesheet).length <=0">
+                <p>No time log entries found.</p>
+            </div>
             <template v-for="log in timesheet">
                 <div class="card my-1">
                     <h5 class="card-header py-1">

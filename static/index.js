@@ -2,6 +2,7 @@
 const AUTH_URL = "/api/api-token-auth/"
 const REGISTER_URL = "/api/register/"
 const TIMESHEET_RESOURCE_URL = "/api/timesheets/"
+const USERS_RESOURCE_URL = "/api/users/"
 
 const AUTH_REQUEST = "AUTH_REQUEST";
 const AUTH_SUCCESS = "AUTH_SUCCESS";
@@ -31,6 +32,10 @@ const TIMESHEET_UPDATE_WORK_ERROR = "TIMESHEET_UPDATE_WORK_ERROR"
 const REPORT_LOAD = "REPORT_LOAD"
 const REPORT_LOAD_SUCCESS = "REPORT_LOAD_SUCCESS"
 const REPORT_LOAD_ERROR = "REPORT_LOAD_ERROR"
+
+const PROFILE_UPDATE = "PROFILE_UPDATE"
+const PROFILE_UPDATE_SUCCESS = "PROFILE_UPDATE_SUCCESS"
+const PROFILE_UPDATE_ERROR = "PROFILE_UPDATE_ERROR"
 
 // store
 const store = new Vuex.Store({
@@ -90,6 +95,7 @@ const store = new Vuex.Store({
                 resolve();
             });
         },
+
         [AUTH_REGISTER]: ({commit, dispatch}, user) => {
             user["profile"] = {"preferred_working_hours": parseInt(user["preferred_working_hours"])}
             delete user["preferred_working_hours"]
@@ -107,6 +113,7 @@ const store = new Vuex.Store({
                     });
             });
         },
+
         [TIMESHEET_LOG_WORK]: ({commit, dispatch, getters}, work_log) => {
             console.log(work_log);
             return new Promise((resolve, reject) => {
@@ -189,6 +196,30 @@ const store = new Vuex.Store({
                     })
                     .catch(err => {
                         commit(REPORT_LOAD_ERROR, err);
+                        reject(err);
+                    });
+            });
+        },
+
+        [PROFILE_UPDATE]: ({commit, dispatch, getters}, user) => {
+            console.log(user);
+            if (user.password === "") {
+                delete user['password']
+            }
+
+            return new Promise((resolve, reject) => {
+                commit(PROFILE_UPDATE);
+                axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
+                axios.put(USERS_RESOURCE_URL + `${getters.userid}/`, user)
+                    .then(resp => {
+                        commit(PROFILE_UPDATE_SUCCESS, resp);
+                        localStorage.setItem("preferred_working_hours", resp.data.profile.preferred_working_hours);
+                        localStorage.setItem("email", resp.data.email);
+                        localStorage.setItem("username", resp.data.username);
+                        resolve(resp);
+                    })
+                    .catch(err => {
+                        commit(PROFILE_UPDATE_ERROR, err);
                         reject(err);
                     });
             });
@@ -277,6 +308,20 @@ const store = new Vuex.Store({
         [REPORT_LOAD_SUCCESS]: (state, resp) => {
             state.appStatus = "loading_report_data_success";
             state.error = "";
+        },
+        [PROFILE_UPDATE]: state => {
+            state.appStatus = "updating_profile";
+        },
+        [PROFILE_UPDATE_ERROR]: (state, err) => {
+            state.appStatus = "profile_update_error";
+            state.error = err;
+        },
+        [PROFILE_UPDATE_SUCCESS]: (state, resp) => {
+            state.appStatus = "profile_updated";
+            state.error = "";
+            state.preferred_working_hours = resp.data.profile.preferred_working_hours;
+            state.email = resp.data.email;
+            state.username = resp.data.username;
         },
     }
 })
@@ -505,11 +550,24 @@ const Profile = Vue.component('profile', {
         update_profile: function () {
             let {username, password, email, preferred_working_hours} = this
             console.log({username, password, email, preferred_working_hours})
+            this.$store.dispatch(PROFILE_UPDATE, {
+                username: username.trim(),
+                email: email.trim(),
+                password: password.trim(),
+                profile: {preferred_working_hours: parseInt(preferred_working_hours)}
+            }).then(() => {
+
+            }).catch(err => {
+                console.log(err)
+            });
         }
     },
     computed: {
-        registerError() {
-            // return this.$store.getters.registerStatus === 'error'
+        hasUpdateError() {
+            return this.$store.getters.appStatus === 'profile_update_error'
+        },
+        updateSucceeded() {
+            return this.$store.getters.appStatus === 'profile_updated'
         }
     },
 });
@@ -608,6 +666,6 @@ const mainApp = new Vue({
     computed: {
         isAuthenticated() {
             return this.$store.getters.isAuthenticated
-        }
+        },
     },
 }).$mount('#app');

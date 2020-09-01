@@ -21,7 +21,7 @@
 <div class="bg-white container pb-1">
     <!-- Content -->
     <div id="app">
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-primary pt-1">
             <router-link v-bind:to="'report'" class="navbar-brand">Time Management System</router-link>
             <ul class="navbar-nav ml-auto" v-if="isAuthenticated">
                 <li class="nav-item">
@@ -136,8 +136,7 @@
             <h1>
                 Timesheet
             </h1>
-            <small class="text-muted">Your Preferred Working Hours: <span
-                    v-once>{{ preferredWorkingHours }}</span></small>
+            <small class="text-muted">Your Preferred Working Hours: <span>{{ preferredWorkingHours }}</span></small>
             <hr/>
         </div>
         <form @submit.prevent="log_work">
@@ -272,7 +271,7 @@
             </div>
             <div class="form-group">
                 <label for="password">Password <span
-                        class="text-muted small">Leave this blank if you don't wnat to change your password</span></label>
+                        class="text-muted small">Leave this blank if you don't want to change your password</span></label>
                 <input v-model="password" type="password" class="form-control" placeholder="*****">
             </div>
             <div class="form-group">
@@ -280,8 +279,11 @@
                 <input required v-model="preferred_working_hours" type="text"
                        class="form-control" placeholder="8">
             </div>
-            <div class="register-failed" v-if="registerError">
+            <div class="register-failed alert alert-danger" v-if="hasUpdateError">
                 Profile update failed. Please try again.
+            </div>
+            <div class="register-failed alert alert-success" v-if="updateSucceeded">
+                Profile updated successfully.
             </div>
             <div class="form-group">
                 <button type="submit" text="Register"

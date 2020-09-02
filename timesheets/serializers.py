@@ -28,10 +28,10 @@ class UserRootSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
 
     def update(self, instance, validated_data):
-        if instance.is_superuser:
+        if "is_staff" in validated_data:
             instance.is_staff = validated_data.pop('is_staff')
+        if "is_superuser" in validated_data:
             instance.is_superuser = validated_data.pop('is_superuser')
-
         instance.username = validated_data.pop('username')
         instance.email = validated_data.pop('email')
         instance.set_password(validated_data.pop('password'))

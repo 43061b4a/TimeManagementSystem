@@ -108,9 +108,20 @@ class UserDetail(APIView):
 
     def put(self, request, pk, format=None):
         user = self.get_object(pk)
+
         if 'password' not in request.data or request.data['password'] is None:
             request.data['password'] = user.password
+
+        current_user = User.objects.get(username=self.request.user)
+        if not current_user.is_superuser:
+            if 'is_staff' in request.data:
+                del request.data['is_staff']
+
+            if 'is_superuser' in request.data:
+                del request.data['is_superuser']
+
         serializer = UserRootSerializer(user, data=request.data)
+
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)

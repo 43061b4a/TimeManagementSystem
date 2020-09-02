@@ -49,6 +49,8 @@ const store = new Vuex.Store({
         email: localStorage.getItem("email") || '',
         username: localStorage.getItem("username") || '',
         userid: localStorage.getItem("userid") || '',
+        is_superuser: localStorage.getItem("is_superuser") || '',
+        is_staff: localStorage.getItem("is_staff") || '',
         status: '',
         registered: '',
         appStatus: '',
@@ -63,6 +65,8 @@ const store = new Vuex.Store({
         email: state => state.email,
         username: state => state.username,
         userid: state => state.userid,
+        is_superuser: state => state.is_superuser,
+        is_staff: state => state.is_staff,
     },
     actions: {
         [AUTH_REQUEST]: ({commit, dispatch}, user) => {
@@ -76,6 +80,8 @@ const store = new Vuex.Store({
                         localStorage.setItem("email", resp.data.email);
                         localStorage.setItem("username", resp.data.username);
                         localStorage.setItem("userid", resp.data.user_id);
+                        localStorage.setItem("is_superuser", resp.data.is_superuser);
+                        localStorage.setItem("is_staff", resp.data.is_staff);
 
                         axios.defaults.headers.common['Authorization'] = "Token " + resp.data.token
                         commit(AUTH_SUCCESS, resp);
@@ -96,6 +102,8 @@ const store = new Vuex.Store({
                 localStorage.removeItem("email");
                 localStorage.removeItem("username");
                 localStorage.removeItem("userid");
+                localStorage.removeItem("is_superuser");
+                localStorage.removeItem("is_staff");
                 resolve();
             });
         },
@@ -241,6 +249,8 @@ const store = new Vuex.Store({
                         localStorage.removeItem("username");
                         localStorage.removeItem("user-token");
                         localStorage.removeItem("userid");
+                        localStorage.removeItem("is_superuser");
+                        localStorage.removeItem("is_staff");
                         resolve(resp);
                     })
                     .catch(err => {
@@ -261,6 +271,8 @@ const store = new Vuex.Store({
             state.email = resp.data.email;
             state.username = resp.data.username;
             state.userid = resp.data.user_id;
+            state.is_superuser = resp.data.is_superuser;
+            state.is_staff = resp.data.is_staff;
         },
         [AUTH_ERROR]: state => {
             state.status = "error";
@@ -363,6 +375,8 @@ const store = new Vuex.Store({
             state.username = "";
             state.token = "";
             state.userid = "";
+            state.is_superuser = "";
+            state.is_staff = "";
         },
     }
 })

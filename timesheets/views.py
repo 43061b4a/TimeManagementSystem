@@ -153,7 +153,7 @@ class CustomAuthToken(ObtainAuthToken):
             'username': user.username,
             'email': user.email,
             'is_staff': user.is_staff,
-            'is_superuser': user.is_staff,
+            'is_superuser': user.is_superuser,
             'preferred_working_hours': profile.preferred_working_hours
         })
 

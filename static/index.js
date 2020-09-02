@@ -205,7 +205,7 @@ const store = new Vuex.Store({
             return new Promise((resolve, reject) => {
                 commit(REPORT_LOAD);
                 axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
-                axios.get(TIMESHEET_RESOURCE_URL + `?startdate=${start}&enddate=${end}&sort=workday`)
+                axios.get(TIMESHEET_RESOURCE_URL + `?startdate=${start}&enddate=${end}&sort=workday&username=${getters.username}`)
                     .then(resp => {
                         commit(REPORT_LOAD_SUCCESS, resp);
                         resolve(resp);

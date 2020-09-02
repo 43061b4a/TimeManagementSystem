@@ -37,7 +37,7 @@ class WorkList(generics.ListCreateAPIView):
         else:
             if username is not None:
                 current_user = User.objects.get(username=username)
-            set_if_not_none(filter_params, 'owner', current_user)
+                set_if_not_none(filter_params, 'owner', current_user)
 
         set_if_not_none(filter_params, 'workday__gte', startdate)
         set_if_not_none(filter_params, 'workday__lte', enddate)

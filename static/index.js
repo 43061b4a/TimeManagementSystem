@@ -37,9 +37,13 @@ const PROFILE_UPDATE = "PROFILE_UPDATE"
 const PROFILE_UPDATE_SUCCESS = "PROFILE_UPDATE_SUCCESS"
 const PROFILE_UPDATE_ERROR = "PROFILE_UPDATE_ERROR"
 
-const AUTH_DELETE = "AUTH_DELETE";
-const AUTH_DELETE_SUCCESS = "AUTH_DELETE_SUCCESS";
-const AUTH_DELETE_ERROR = "AUTH_DELETE_ERROR";
+const AUTH_DELETE = "AUTH_DELETE"
+const AUTH_DELETE_SUCCESS = "AUTH_DELETE_SUCCESS"
+const AUTH_DELETE_ERROR = "AUTH_DELETE_ERROR"
+
+const ADMIN_TIMESHEET_LOAD = "ADMIN_TIMESHEET_LOAD"
+const ADMIN_TIMESHEET_LOAD_SUCCESS = "ADMIN_TIMESHEET_LOAD_SUCCESS"
+const ADMIN_TIMESHEET_LOAD_ERROR = "ADMIN_TIMESHEET_LOAD_ERROR"
 
 // store
 const store = new Vuex.Store({
@@ -65,8 +69,8 @@ const store = new Vuex.Store({
         email: state => state.email,
         username: state => state.username,
         userid: state => state.userid,
-        is_superuser: state => state.is_superuser,
-        is_staff: state => state.is_staff,
+        is_superuser: state => (typeof state.is_superuser) == "boolean" ? state.is_superuser : state.is_superuser === 'true',
+        is_staff: state => (typeof state.is_staff) == "boolean" ? state.is_staff : state.is_staff === 'true',
     },
     actions: {
         [AUTH_REQUEST]: ({commit, dispatch}, user) => {
@@ -148,7 +152,7 @@ const store = new Vuex.Store({
             return new Promise((resolve, reject) => {
                 commit(TIMESHEET_LOAD);
                 axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
-                axios.get(TIMESHEET_RESOURCE_URL + `?workday=${workday.workday}`)
+                axios.get(TIMESHEET_RESOURCE_URL + `?workday=${workday.workday}&username=${getters.username}`)
                     .then(resp => {
                         commit(TIMESHEET_LOAD_SUCCESS, resp);
                         resolve(resp);
@@ -255,6 +259,22 @@ const store = new Vuex.Store({
                     })
                     .catch(err => {
                         commit(AUTH_DELETE_ERROR, err);
+                        reject(err);
+                    });
+            });
+        },
+
+        [ADMIN_TIMESHEET_LOAD]: ({commit, dispatch, getters}) => {
+            return new Promise((resolve, reject) => {
+                commit(ADMIN_TIMESHEET_LOAD);
+                axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
+                axios.get(TIMESHEET_RESOURCE_URL)
+                    .then(resp => {
+                        commit(ADMIN_TIMESHEET_LOAD_SUCCESS, resp);
+                        resolve(resp);
+                    })
+                    .catch(err => {
+                        commit(ADMIN_TIMESHEET_LOAD_ERROR, err);
                         reject(err);
                     });
             });
@@ -377,6 +397,17 @@ const store = new Vuex.Store({
             state.userid = "";
             state.is_superuser = "";
             state.is_staff = "";
+        },
+        [ADMIN_TIMESHEET_LOAD]: state => {
+            state.appStatus = "loading_admin_timesheet_data";
+        },
+        [ADMIN_TIMESHEET_LOAD_ERROR]: (state, err) => {
+            state.appStatus = "loading_admin_timesheet_error";
+            state.error = err;
+        },
+        [ADMIN_TIMESHEET_LOAD_SUCCESS]: (state, resp) => {
+            state.appStatus = "loading_admin_timesheet_success";
+            state.error = "";
         },
     }
 })
@@ -636,6 +667,39 @@ const Profile = Vue.component('profile', {
     },
 });
 
+const UsersAdmin = Vue.component('UsersAdminComponent', {
+    data() {
+        return {};
+    },
+    template: '#users-admin-template',
+    methods: {},
+    computed: {},
+});
+
+
+const TimesheetsAdmin = Vue.component('TimesheetsAdminComponent', {
+    data() {
+        return {
+            timesheets: []
+        };
+    },
+    template: '#timesheets-admin-template',
+    methods: {
+        refresh_timesheets_data: function () {
+            this.$store.dispatch(ADMIN_TIMESHEET_LOAD, {}).then((resp) => {
+                this.timesheets = resp.data
+                console.log(resp)
+            }).catch(err => {
+                console.log(err)
+            });
+        }
+    },
+    computed: {},
+    beforeMount: function () {
+        this.refresh_timesheets_data()
+    }
+});
+
 
 const NotFoundComponent = Vue.component('NotFoundComponent', {
     data() {
@@ -657,6 +721,7 @@ const routes = [
     {
         path: '/',
         redirect: 'report',
+        name: 'default',
         component: Report
     },
     {
@@ -699,6 +764,24 @@ const routes = [
         }
     },
     {
+        path: '/manage-timesheets',
+        name: 'timesheetsAdmin',
+        component: TimesheetsAdmin,
+        meta: {
+            requiresAuth: true,
+            requiresAdmin: true,
+        }
+    },
+    {
+        path: '/manage-users',
+        name: 'usersAdmin',
+        component: UsersAdmin,
+        meta: {
+            requiresAuth: true,
+            requiresSuperuser: true
+        }
+    },
+    {
         path: '*',
         component: NotFoundComponent
     }
@@ -714,8 +797,16 @@ router.beforeEach((to, from, next) => {
         // this route requires auth, check if logged in
         // if not, redirect to login page.
         if (!store.getters.isAuthenticated) {
-            next({name: 'Login'})
+            next({name: 'login'})
         } else {
+            if (to.matched.some(record => record.meta.requiresSuperuser))
+                if (!store.getters.is_superuser) {
+                    next({name: 'default'})
+                }
+            if (to.matched.some(record => record.meta.requiresAdmin))
+                if (!store.getters.is_superuser && !store.getters.is_staff) {
+                    next({name: 'default'})
+                }
             next() // go to wherever I'm going
         }
     } else {
@@ -730,6 +821,12 @@ const mainApp = new Vue({
     computed: {
         isAuthenticated() {
             return this.$store.getters.isAuthenticated
+        },
+        isStaff() {
+            return this.$store.getters.is_staff
+        },
+        isSuperuser() {
+            return this.$store.getters.is_superuser
         },
     },
 }).$mount('#app');

@@ -45,6 +45,10 @@ const ADMIN_TIMESHEET_LOAD = "ADMIN_TIMESHEET_LOAD"
 const ADMIN_TIMESHEET_LOAD_SUCCESS = "ADMIN_TIMESHEET_LOAD_SUCCESS"
 const ADMIN_TIMESHEET_LOAD_ERROR = "ADMIN_TIMESHEET_LOAD_ERROR"
 
+const ADMIN_TIMESHEET_DELETE = "ADMIN_TIMESHEET_DELETE"
+const ADMIN_TIMESHEET_DELETE_SUCCESS = "ADMIN_TIMESHEET_DELETE_SUCCESS"
+const ADMIN_TIMESHEET_DELETE_ERROR = "ADMIN_TIMESHEET_DELETE_ERROR"
+
 // store
 const store = new Vuex.Store({
     state: {
@@ -279,6 +283,24 @@ const store = new Vuex.Store({
                     });
             });
         },
+
+        [ADMIN_TIMESHEET_DELETE]: ({commit, dispatch, getters}, id) => {
+            console.log(id);
+            return new Promise((resolve, reject) => {
+                commit(ADMIN_TIMESHEET_DELETE);
+                axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
+                axios.delete(TIMESHEET_RESOURCE_URL + `${id.id}/`)
+                    .then(resp => {
+                        commit(ADMIN_TIMESHEET_DELETE_SUCCESS, resp);
+                        resolve(resp);
+                    })
+                    .catch(err => {
+                        commit(ADMIN_TIMESHEET_DELETE_ERROR, err);
+                        reject(err);
+                    });
+            });
+        },
+
     },
     mutations: {
         [AUTH_REQUEST]: state => {
@@ -407,6 +429,17 @@ const store = new Vuex.Store({
         },
         [ADMIN_TIMESHEET_LOAD_SUCCESS]: (state, resp) => {
             state.appStatus = "loading_admin_timesheet_success";
+            state.error = "";
+        },
+        [ADMIN_TIMESHEET_DELETE]: state => {
+            state.appStatus = "admin_deleting_work";
+        },
+        [ADMIN_TIMESHEET_DELETE_ERROR]: (state, err) => {
+            state.appStatus = "admin_work_delete_error";
+            state.error = err;
+        },
+        [ADMIN_TIMESHEET_DELETE_SUCCESS]: (state, resp) => {
+            state.appStatus = "admin_work_deleted";
             state.error = "";
         },
     }
@@ -688,10 +721,18 @@ const TimesheetsAdmin = Vue.component('TimesheetsAdminComponent', {
         refresh_timesheets_data: function () {
             this.$store.dispatch(ADMIN_TIMESHEET_LOAD, {}).then((resp) => {
                 this.timesheets = resp.data
-                console.log(resp)
             }).catch(err => {
                 console.log(err)
             });
+        },
+        admin_delete_work: function (work) {
+            if (confirm("Do you really want to delete?")) {
+                this.$store.dispatch(ADMIN_TIMESHEET_DELETE, {id: work.id}).then(() => {
+                    this.refresh_timesheets_data()
+                }).catch(err => {
+                    console.log(err.response.data)
+                });
+            }
         }
     },
     computed: {},

@@ -63,6 +63,19 @@ class WorkDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = WorkSerializer
     permission_classes = [permissions.IsAuthenticated]
 
+    def destroy(self, request, *args, **kwargs):
+        current_user = User.objects.get(username=self.request.user)
+        work = Work.objects.get(**kwargs)
+        if not work:
+            return Response(data={'message': "Too late to delete"},
+                            status=status.HTTP_400_BAD_REQUEST)
+        if current_user.is_staff or current_user.is_superuser or work.owner == current_user:
+            self.perform_destroy(work)
+        else:
+            return Response(data={'message': "You're not allowed to delete."},
+                            status=status.HTTP_401_UNAUTHORIZED)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
     def get_queryset(self):
         current_user = User.objects.get(username=self.request.user)
         if current_user.is_superuser or current_user.is_staff:

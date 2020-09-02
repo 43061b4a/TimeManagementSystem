@@ -24,13 +24,13 @@
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary pt-1">
             <router-link v-bind:to="'report'" class="navbar-brand">Time Management System</router-link>
             <ul class="navbar-nav ml-auto" v-if="isAuthenticated">
-                <li class="nav-item">
+                <li class="nav-item" v-if="isSuperuser || isStaff">
                     <router-link to="/manage-timesheets" class="nav-link my-2">All Timesheets</router-link>
                 </li>
                 <li class="nav-item" v-if="isSuperuser">
                     <router-link to="/manage-users" class="nav-link my-2">All Users</router-link>
                 </li>
-                <li class="nav-item" v-if="isSuperuser || isStaff">
+                <li class="nav-item">
                     <router-link to="/timesheet" class="nav-link my-2">My Timesheet</router-link>
                 </li>
                 <li>

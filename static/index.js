@@ -57,6 +57,10 @@ const ADMIN_USERS_LOAD = "ADMIN_USERS_LOAD"
 const ADMIN_USERS_LOAD_SUCCESS = "ADMIN_USERS_LOAD_SUCCESS"
 const ADMIN_USERS_LOAD_ERROR = "ADMIN_USERS_LOAD_ERROR"
 
+const ADMIN_USERS_DELETE = "ADMIN_USERS_DELETE"
+const ADMIN_USERS_DELETE_SUCCESS = "ADMIN_USERS_DELETE_SUCCESS"
+const ADMIN_USERS_DELETE_ERROR = "ADMIN_USERS_DELETE_ERROR"
+
 // store
 const store = new Vuex.Store({
     state: {
@@ -342,6 +346,22 @@ const store = new Vuex.Store({
             });
         },
 
+        [ADMIN_USERS_DELETE]: ({commit, dispatch, getters}, user) => {
+            return new Promise((resolve, reject) => {
+                commit(ADMIN_USERS_DELETE);
+                axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
+                axios.delete(USERS_RESOURCE_URL + `${user.id}/`, user)
+                    .then(resp => {
+                        commit(ADMIN_USERS_DELETE_SUCCESS, resp);
+                        resolve(resp);
+                    })
+                    .catch(err => {
+                        commit(ADMIN_USERS_DELETE_ERROR, err);
+                        reject(err);
+                    });
+            });
+        },
+
     },
     mutations: {
         [AUTH_REQUEST]: state => {
@@ -503,6 +523,17 @@ const store = new Vuex.Store({
         },
         [ADMIN_USERS_LOAD_SUCCESS]: (state, resp) => {
             state.appStatus = "loading_admin_users_success";
+            state.error = "";
+        },
+        [ADMIN_USERS_DELETE]: state => {
+            state.appStatus = "loading_admin_users_delete";
+        },
+        [ADMIN_USERS_DELETE_ERROR]: (state, err) => {
+            state.appStatus = "deletion_admin_users_error";
+            state.error = err;
+        },
+        [ADMIN_USERS_DELETE_SUCCESS]: (state, resp) => {
+            state.appStatus = "deletion_admin_users_success";
             state.error = "";
         },
     }
@@ -779,6 +810,19 @@ const UsersAdmin = Vue.component('UsersAdminComponent', {
                 console.log(err)
             });
         },
+        admin_delete_user: function (user) {
+            if (confirm("Do you really want to delete?")) {
+                this.$store.dispatch(ADMIN_USERS_DELETE, user).then(() => {
+                    if (this.$store.getters.username === user.username) {
+                        this.$router.push('/logout')
+                    } else {
+                        this.refresh_users_data()
+                    }
+                }).catch(err => {
+                    console.log(err.response.data)
+                });
+            }
+        }
     },
     computed: {},
     beforeMount: function () {

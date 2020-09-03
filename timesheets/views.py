@@ -138,8 +138,12 @@ class UserDetail(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, pk, format=None):
+        current_user = User.objects.get(username=self.request.user)
         user = self.get_object(pk)
-        user.delete()
+        if current_user.is_superuser or user == current_user:
+            user.delete()
+        else:
+            return Response('Not authorised to delete.', status=status.HTTP_400_BAD_REQUEST)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 

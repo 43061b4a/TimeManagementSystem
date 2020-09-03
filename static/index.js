@@ -382,6 +382,12 @@ const store = new Vuex.Store({
         },
         [AUTH_LOGOUT]: state => {
             state.token = "";
+            state.preferred_working_hours = "";
+            state.email = "";
+            state.username = "";
+            state.userid = "";
+            state.is_superuser = "";
+            state.is_staff = "";
         },
         [AUTH_REGISTER]: state => {
             state.registered = "registering";

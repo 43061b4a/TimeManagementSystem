@@ -66,9 +66,6 @@ class WorkDetail(generics.RetrieveUpdateDestroyAPIView):
     def destroy(self, request, *args, **kwargs):
         current_user = User.objects.get(username=self.request.user)
         work = Work.objects.get(**kwargs)
-        if not work:
-            return Response(data={'message': "Too late to delete"},
-                            status=status.HTTP_400_BAD_REQUEST)
         if current_user.is_staff or current_user.is_superuser or work.owner == current_user:
             self.perform_destroy(work)
         else:

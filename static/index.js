@@ -49,6 +49,10 @@ const ADMIN_TIMESHEET_DELETE = "ADMIN_TIMESHEET_DELETE"
 const ADMIN_TIMESHEET_DELETE_SUCCESS = "ADMIN_TIMESHEET_DELETE_SUCCESS"
 const ADMIN_TIMESHEET_DELETE_ERROR = "ADMIN_TIMESHEET_DELETE_ERROR"
 
+const ADMIN_WORK_UPDATE = "ADMIN_WORK_UPDATE"
+const ADMIN_WORK_UPDATE_SUCCESS = "ADMIN_WORK_UPDATE_SUCCESS"
+const ADMIN_WORK_UPDATE_ERROR = "ADMIN_WORK_UPDATE_ERROR"
+
 // store
 const store = new Vuex.Store({
     state: {
@@ -301,6 +305,23 @@ const store = new Vuex.Store({
             });
         },
 
+        [ADMIN_WORK_UPDATE]: ({commit, dispatch, getters}, work) => {
+            console.log(work);
+            return new Promise((resolve, reject) => {
+                commit(ADMIN_WORK_UPDATE);
+                axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
+                axios.put(TIMESHEET_RESOURCE_URL + `${work.id}/`, work)
+                    .then(resp => {
+                        commit(ADMIN_WORK_UPDATE_SUCCESS, resp);
+                        resolve(resp);
+                    })
+                    .catch(err => {
+                        commit(ADMIN_WORK_UPDATE_ERROR, err);
+                        reject(err);
+                    });
+            });
+        },
+
     },
     mutations: {
         [AUTH_REQUEST]: state => {
@@ -440,6 +461,17 @@ const store = new Vuex.Store({
         },
         [ADMIN_TIMESHEET_DELETE_SUCCESS]: (state, resp) => {
             state.appStatus = "admin_work_deleted";
+            state.error = "";
+        },
+        [ADMIN_WORK_UPDATE]: state => {
+            state.appStatus = "updating_admin_work";
+        },
+        [ADMIN_WORK_UPDATE_ERROR]: (state, err) => {
+            state.appStatus = "admin_work_update_error";
+            state.error = err;
+        },
+        [ADMIN_WORK_UPDATE_SUCCESS]: (state, resp) => {
+            state.appStatus = "admin_work_updated";
             state.error = "";
         },
     }
@@ -733,7 +765,19 @@ const TimesheetsAdmin = Vue.component('TimesheetsAdminComponent', {
                     console.log(err.response.data)
                 });
             }
-        }
+        },
+        admin_update_work: function (work) {
+            this.$store.dispatch(ADMIN_WORK_UPDATE, {
+                id: work.id,
+                workday: work.workday,
+                description: work.description,
+                duration: work.duration
+            }).then(() => {
+                this.refresh_timesheets_data()
+            }).catch(err => {
+                console.log(err)
+            });
+        },
     },
     computed: {},
     beforeMount: function () {

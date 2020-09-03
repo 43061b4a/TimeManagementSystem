@@ -53,6 +53,10 @@ const ADMIN_WORK_UPDATE = "ADMIN_WORK_UPDATE"
 const ADMIN_WORK_UPDATE_SUCCESS = "ADMIN_WORK_UPDATE_SUCCESS"
 const ADMIN_WORK_UPDATE_ERROR = "ADMIN_WORK_UPDATE_ERROR"
 
+const ADMIN_USERS_LOAD = "ADMIN_USERS_LOAD"
+const ADMIN_USERS_LOAD_SUCCESS = "ADMIN_USERS_LOAD_SUCCESS"
+const ADMIN_USERS_LOAD_ERROR = "ADMIN_USERS_LOAD_ERROR"
+
 // store
 const store = new Vuex.Store({
     state: {
@@ -322,6 +326,22 @@ const store = new Vuex.Store({
             });
         },
 
+        [ADMIN_USERS_LOAD]: ({commit, dispatch, getters}) => {
+            return new Promise((resolve, reject) => {
+                commit(ADMIN_USERS_LOAD);
+                axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
+                axios.get(USERS_RESOURCE_URL)
+                    .then(resp => {
+                        commit(ADMIN_USERS_LOAD_SUCCESS, resp);
+                        resolve(resp);
+                    })
+                    .catch(err => {
+                        commit(ADMIN_USERS_LOAD_ERROR, err);
+                        reject(err);
+                    });
+            });
+        },
+
     },
     mutations: {
         [AUTH_REQUEST]: state => {
@@ -472,6 +492,17 @@ const store = new Vuex.Store({
         },
         [ADMIN_WORK_UPDATE_SUCCESS]: (state, resp) => {
             state.appStatus = "admin_work_updated";
+            state.error = "";
+        },
+        [ADMIN_USERS_LOAD]: state => {
+            state.appStatus = "loading_admin_users_data";
+        },
+        [ADMIN_USERS_LOAD_ERROR]: (state, err) => {
+            state.appStatus = "loading_admin_users_error";
+            state.error = err;
+        },
+        [ADMIN_USERS_LOAD_SUCCESS]: (state, resp) => {
+            state.appStatus = "loading_admin_users_success";
             state.error = "";
         },
     }
@@ -734,11 +765,25 @@ const Profile = Vue.component('profile', {
 
 const UsersAdmin = Vue.component('UsersAdminComponent', {
     data() {
-        return {};
+        return {
+            users: []
+        };
     },
     template: '#users-admin-template',
-    methods: {},
+    methods: {
+        refresh_users_data: function () {
+            this.$store.dispatch(ADMIN_USERS_LOAD, {}).then((resp) => {
+                this.users = resp.data
+                console.log(this.users)
+            }).catch(err => {
+                console.log(err)
+            });
+        },
+    },
     computed: {},
+    beforeMount: function () {
+        this.refresh_users_data()
+    }
 });
 
 

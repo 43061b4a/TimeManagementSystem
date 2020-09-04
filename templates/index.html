@@ -22,7 +22,11 @@
     <!-- Content -->
     <div id="app">
         <nav class="navbar navbar-expand-lg navbar-dark bg-primary pt-1">
-            <router-link v-bind:to="'report'" class="navbar-brand">Time Management System</router-link>
+            {% verbatim %}
+            <router-link v-bind:to="'report'" class="navbar-brand">Time Management System <br/>
+                <span v-if="currentuser" class="text-warning small">Welcome {{ currentuser }}!</span>
+            </router-link>
+            {% endverbatim %}
             <ul class="navbar-nav ml-auto" v-if="isAuthenticated">
                 <li class="nav-item" v-if="isSuperuser || isStaff">
                     <router-link to="/manage-timesheets" class="nav-link my-2">All Timesheets</router-link>

@@ -97,127 +97,127 @@ const store = new Vuex.Store({
     actions: {
         [AUTH_REQUEST]: ({commit, dispatch}, user) => {
             return new Promise((resolve, reject) => {
-                commit(AUTH_REQUEST);
+                commit(AUTH_REQUEST)
                 axios({url: AUTH_URL, data: user, method: "POST"})
                     .then(resp => {
                         console.log(resp)
-                        localStorage.setItem("user-token", resp.data.token);
-                        localStorage.setItem("preferred_working_hours", resp.data.preferred_working_hours);
-                        localStorage.setItem("email", resp.data.email);
-                        localStorage.setItem("username", resp.data.username);
-                        localStorage.setItem("userid", resp.data.user_id);
-                        localStorage.setItem("is_superuser", resp.data.is_superuser);
-                        localStorage.setItem("is_staff", resp.data.is_staff);
+                        localStorage.setItem("user-token", resp.data.token)
+                        localStorage.setItem("preferred_working_hours", resp.data.preferred_working_hours)
+                        localStorage.setItem("email", resp.data.email)
+                        localStorage.setItem("username", resp.data.username)
+                        localStorage.setItem("userid", resp.data.user_id)
+                        localStorage.setItem("is_superuser", resp.data.is_superuser)
+                        localStorage.setItem("is_staff", resp.data.is_staff)
 
                         axios.defaults.headers.common['Authorization'] = "Token " + resp.data.token
-                        commit(AUTH_SUCCESS, resp);
-                        resolve(resp);
+                        commit(AUTH_SUCCESS, resp)
+                        resolve(resp)
                     })
                     .catch(err => {
-                        commit(AUTH_ERROR, err);
-                        localStorage.removeItem("user-token");
-                        reject(err);
-                    });
-            });
+                        commit(AUTH_ERROR, err)
+                        localStorage.removeItem("user-token")
+                        reject(err)
+                    })
+            })
         },
         [AUTH_LOGOUT]: ({commit}) => {
             return new Promise(resolve => {
-                commit(AUTH_LOGOUT);
+                commit(AUTH_LOGOUT)
                 localStorage.removeItem("user-token")
                 localStorage.removeItem("preferred_working_hours")
-                localStorage.removeItem("email");
-                localStorage.removeItem("username");
-                localStorage.removeItem("userid");
-                localStorage.removeItem("is_superuser");
-                localStorage.removeItem("is_staff");
-                resolve();
-            });
+                localStorage.removeItem("email")
+                localStorage.removeItem("username")
+                localStorage.removeItem("userid")
+                localStorage.removeItem("is_superuser")
+                localStorage.removeItem("is_staff")
+                resolve()
+            })
         },
 
         [AUTH_REGISTER]: ({commit, dispatch}, user) => {
             user["profile"] = {"preferred_working_hours": parseInt(user["preferred_working_hours"])}
             delete user["preferred_working_hours"]
-            console.log(user);
+            console.log(user)
             return new Promise((resolve, reject) => {
-                commit(AUTH_REGISTER);
+                commit(AUTH_REGISTER)
                 axios.post(REGISTER_URL, user)
                     .then(resp => {
-                        commit(AUTH_REGISTER_SUCCESS, resp);
-                        resolve(resp);
+                        commit(AUTH_REGISTER_SUCCESS, resp)
+                        resolve(resp)
                     })
                     .catch(err => {
-                        commit(AUTH_REGISTER_ERROR, err);
-                        reject(err);
-                    });
-            });
+                        commit(AUTH_REGISTER_ERROR, err)
+                        reject(err)
+                    })
+            })
         },
 
         [TIMESHEET_LOG_WORK]: ({commit, dispatch, getters}, work_log) => {
-            console.log(work_log);
+            console.log(work_log)
             return new Promise((resolve, reject) => {
-                commit(TIMESHEET_LOG_WORK);
+                commit(TIMESHEET_LOG_WORK)
                 axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
                 axios.post(TIMESHEET_RESOURCE_URL, work_log)
                     .then(resp => {
-                        commit(TIMESHEET_LOG_WORK_SUCCESS, resp);
-                        resolve(resp);
+                        commit(TIMESHEET_LOG_WORK_SUCCESS, resp)
+                        resolve(resp)
                     })
                     .catch(err => {
-                        commit(TIMESHEET_LOG_WORK_ERROR, err);
-                        reject(err);
-                    });
-            });
+                        commit(TIMESHEET_LOG_WORK_ERROR, err)
+                        reject(err)
+                    })
+            })
         },
 
         [TIMESHEET_LOAD]: ({commit, dispatch, getters}, workday) => {
-            console.log(workday);
+            console.log(workday)
             return new Promise((resolve, reject) => {
-                commit(TIMESHEET_LOAD);
+                commit(TIMESHEET_LOAD)
                 axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
                 axios.get(TIMESHEET_RESOURCE_URL + `?workday=${workday.workday}&username=${getters.username}`)
                     .then(resp => {
-                        commit(TIMESHEET_LOAD_SUCCESS, resp);
-                        resolve(resp);
+                        commit(TIMESHEET_LOAD_SUCCESS, resp)
+                        resolve(resp)
                     })
                     .catch(err => {
-                        commit(TIMESHEET_LOAD_ERROR, err);
-                        reject(err);
-                    });
-            });
+                        commit(TIMESHEET_LOAD_ERROR, err)
+                        reject(err)
+                    })
+            })
         },
 
         [TIMESHEET_DELETE_WORK]: ({commit, dispatch, getters}, id) => {
-            console.log(id);
+            console.log(id)
             return new Promise((resolve, reject) => {
-                commit(TIMESHEET_LOAD);
+                commit(TIMESHEET_LOAD)
                 axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
                 axios.delete(TIMESHEET_RESOURCE_URL + `${id.id}/`)
                     .then(resp => {
-                        commit(TIMESHEET_DELETE_WORK_SUCCESS, resp);
-                        resolve(resp);
+                        commit(TIMESHEET_DELETE_WORK_SUCCESS, resp)
+                        resolve(resp)
                     })
                     .catch(err => {
-                        commit(TIMESHEET_DELETE_WORK_ERROR, err);
-                        reject(err);
-                    });
-            });
+                        commit(TIMESHEET_DELETE_WORK_ERROR, err)
+                        reject(err)
+                    })
+            })
         },
 
         [TIMESHEET_UPDATE_WORK]: ({commit, dispatch, getters}, work) => {
-            console.log(work);
+            console.log(work)
             return new Promise((resolve, reject) => {
-                commit(TIMESHEET_UPDATE_WORK);
+                commit(TIMESHEET_UPDATE_WORK)
                 axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
                 axios.put(TIMESHEET_RESOURCE_URL + `${work.id}/`, work)
                     .then(resp => {
-                        commit(TIMESHEET_UPDATE_WORK_SUCCESS, resp);
-                        resolve(resp);
+                        commit(TIMESHEET_UPDATE_WORK_SUCCESS, resp)
+                        resolve(resp)
                     })
                     .catch(err => {
-                        commit(TIMESHEET_UPDATE_WORK_ERROR, err);
-                        reject(err);
-                    });
-            });
+                        commit(TIMESHEET_UPDATE_WORK_ERROR, err)
+                        reject(err)
+                    })
+            })
         },
 
         [REPORT_LOAD]: ({commit, dispatch, getters}, dates) => {
@@ -225,174 +225,174 @@ const store = new Vuex.Store({
             console.log(dates)
             console.log(start, end)
             return new Promise((resolve, reject) => {
-                commit(REPORT_LOAD);
+                commit(REPORT_LOAD)
                 axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
                 axios.get(TIMESHEET_RESOURCE_URL + `?startdate=${start}&enddate=${end}&sort=workday&username=${getters.username}`)
                     .then(resp => {
-                        commit(REPORT_LOAD_SUCCESS, resp);
-                        resolve(resp);
+                        commit(REPORT_LOAD_SUCCESS, resp)
+                        resolve(resp)
                     })
                     .catch(err => {
-                        commit(REPORT_LOAD_ERROR, err);
-                        reject(err);
-                    });
-            });
+                        commit(REPORT_LOAD_ERROR, err)
+                        reject(err)
+                    })
+            })
         },
 
         [PROFILE_UPDATE]: ({commit, dispatch, getters}, user) => {
-            console.log(user);
+            console.log(user)
             if (user.password === "") {
                 delete user['password']
             }
 
             return new Promise((resolve, reject) => {
-                commit(PROFILE_UPDATE);
+                commit(PROFILE_UPDATE)
                 axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
                 axios.put(USERS_RESOURCE_URL + `${getters.userid}/`, user)
                     .then(resp => {
-                        commit(PROFILE_UPDATE_SUCCESS, resp);
-                        localStorage.setItem("preferred_working_hours", resp.data.profile.preferred_working_hours);
-                        localStorage.setItem("email", resp.data.email);
-                        localStorage.setItem("username", resp.data.username);
-                        resolve(resp);
+                        commit(PROFILE_UPDATE_SUCCESS, resp)
+                        localStorage.setItem("preferred_working_hours", resp.data.profile.preferred_working_hours)
+                        localStorage.setItem("email", resp.data.email)
+                        localStorage.setItem("username", resp.data.username)
+                        resolve(resp)
                     })
                     .catch(err => {
-                        commit(PROFILE_UPDATE_ERROR, err);
-                        reject(err);
-                    });
-            });
+                        commit(PROFILE_UPDATE_ERROR, err)
+                        reject(err)
+                    })
+            })
         },
 
         [AUTH_DELETE]: ({commit, dispatch, getters}, user) => {
             return new Promise((resolve, reject) => {
-                commit(AUTH_DELETE);
+                commit(AUTH_DELETE)
                 axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
                 axios.delete(USERS_RESOURCE_URL + `${getters.userid}/`, user)
                     .then(resp => {
-                        commit(AUTH_DELETE_SUCCESS, resp);
-                        localStorage.removeItem("preferred_working_hours");
-                        localStorage.removeItem("email");
-                        localStorage.removeItem("username");
-                        localStorage.removeItem("user-token");
-                        localStorage.removeItem("userid");
-                        localStorage.removeItem("is_superuser");
-                        localStorage.removeItem("is_staff");
-                        resolve(resp);
+                        commit(AUTH_DELETE_SUCCESS, resp)
+                        localStorage.removeItem("preferred_working_hours")
+                        localStorage.removeItem("email")
+                        localStorage.removeItem("username")
+                        localStorage.removeItem("user-token")
+                        localStorage.removeItem("userid")
+                        localStorage.removeItem("is_superuser")
+                        localStorage.removeItem("is_staff")
+                        resolve(resp)
                     })
                     .catch(err => {
-                        commit(AUTH_DELETE_ERROR, err);
-                        reject(err);
-                    });
-            });
+                        commit(AUTH_DELETE_ERROR, err)
+                        reject(err)
+                    })
+            })
         },
 
         [ADMIN_TIMESHEET_LOAD]: ({commit, dispatch, getters}) => {
             return new Promise((resolve, reject) => {
-                commit(ADMIN_TIMESHEET_LOAD);
+                commit(ADMIN_TIMESHEET_LOAD)
                 axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
                 axios.get(TIMESHEET_RESOURCE_URL)
                     .then(resp => {
-                        commit(ADMIN_TIMESHEET_LOAD_SUCCESS, resp);
-                        resolve(resp);
+                        commit(ADMIN_TIMESHEET_LOAD_SUCCESS, resp)
+                        resolve(resp)
                     })
                     .catch(err => {
-                        commit(ADMIN_TIMESHEET_LOAD_ERROR, err);
-                        reject(err);
-                    });
-            });
+                        commit(ADMIN_TIMESHEET_LOAD_ERROR, err)
+                        reject(err)
+                    })
+            })
         },
 
         [ADMIN_TIMESHEET_DELETE]: ({commit, dispatch, getters}, id) => {
-            console.log(id);
+            console.log(id)
             return new Promise((resolve, reject) => {
-                commit(ADMIN_TIMESHEET_DELETE);
+                commit(ADMIN_TIMESHEET_DELETE)
                 axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
                 axios.delete(TIMESHEET_RESOURCE_URL + `${id.id}/`)
                     .then(resp => {
-                        commit(ADMIN_TIMESHEET_DELETE_SUCCESS, resp);
-                        resolve(resp);
+                        commit(ADMIN_TIMESHEET_DELETE_SUCCESS, resp)
+                        resolve(resp)
                     })
                     .catch(err => {
-                        commit(ADMIN_TIMESHEET_DELETE_ERROR, err);
-                        reject(err);
-                    });
-            });
+                        commit(ADMIN_TIMESHEET_DELETE_ERROR, err)
+                        reject(err)
+                    })
+            })
         },
 
         [ADMIN_WORK_UPDATE]: ({commit, dispatch, getters}, work) => {
-            console.log(work);
+            console.log(work)
             return new Promise((resolve, reject) => {
-                commit(ADMIN_WORK_UPDATE);
+                commit(ADMIN_WORK_UPDATE)
                 axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
                 axios.put(TIMESHEET_RESOURCE_URL + `${work.id}/`, work)
                     .then(resp => {
-                        commit(ADMIN_WORK_UPDATE_SUCCESS, resp);
-                        resolve(resp);
+                        commit(ADMIN_WORK_UPDATE_SUCCESS, resp)
+                        resolve(resp)
                     })
                     .catch(err => {
-                        commit(ADMIN_WORK_UPDATE_ERROR, err);
-                        reject(err);
-                    });
-            });
+                        commit(ADMIN_WORK_UPDATE_ERROR, err)
+                        reject(err)
+                    })
+            })
         },
 
         [ADMIN_USERS_LOAD]: ({commit, dispatch, getters}) => {
             return new Promise((resolve, reject) => {
-                commit(ADMIN_USERS_LOAD);
+                commit(ADMIN_USERS_LOAD)
                 axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
                 axios.get(USERS_RESOURCE_URL)
                     .then(resp => {
-                        commit(ADMIN_USERS_LOAD_SUCCESS, resp);
-                        resolve(resp);
+                        commit(ADMIN_USERS_LOAD_SUCCESS, resp)
+                        resolve(resp)
                     })
                     .catch(err => {
-                        commit(ADMIN_USERS_LOAD_ERROR, err);
-                        reject(err);
-                    });
-            });
+                        commit(ADMIN_USERS_LOAD_ERROR, err)
+                        reject(err)
+                    })
+            })
         },
 
         [ADMIN_USERS_DELETE]: ({commit, dispatch, getters}, user) => {
             return new Promise((resolve, reject) => {
-                commit(ADMIN_USERS_DELETE);
+                commit(ADMIN_USERS_DELETE)
                 axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
                 axios.delete(USERS_RESOURCE_URL + `${user.id}/`, user)
                     .then(resp => {
-                        commit(ADMIN_USERS_DELETE_SUCCESS, resp);
-                        resolve(resp);
+                        commit(ADMIN_USERS_DELETE_SUCCESS, resp)
+                        resolve(resp)
                     })
                     .catch(err => {
-                        commit(ADMIN_USERS_DELETE_ERROR, err);
-                        reject(err);
-                    });
-            });
+                        commit(ADMIN_USERS_DELETE_ERROR, err)
+                        reject(err)
+                    })
+            })
         },
 
 
         [ADMIN_USERS_UPDATE]: ({commit, dispatch, getters}, user) => {
-            console.log(user);
+            console.log(user)
             if (user.password === "") {
                 delete user['password']
             }
 
             return new Promise((resolve, reject) => {
-                commit(ADMIN_USERS_UPDATE);
+                commit(ADMIN_USERS_UPDATE)
                 axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
                 axios.put(USERS_RESOURCE_URL + `${user.id}/`, user)
                     .then(resp => {
-                        commit(ADMIN_USERS_UPDATE_SUCCESS, resp);
+                        commit(ADMIN_USERS_UPDATE_SUCCESS, resp)
                         if (getters.userid === user.id) {
-                            localStorage.setItem("preferred_working_hours", resp.data.profile.preferred_working_hours);
-                            localStorage.setItem("email", resp.data.email);
-                            localStorage.setItem("username", resp.data.username);
+                            localStorage.setItem("preferred_working_hours", resp.data.profile.preferred_working_hours)
+                            localStorage.setItem("email", resp.data.email)
+                            localStorage.setItem("username", resp.data.username)
                         }
-                        resolve(resp);
+                        resolve(resp)
                     })
                     .catch(err => {
-                        commit(ADMIN_USERS_UPDATE_ERROR, err);
-                        reject(err);
-                    });
-            });
+                        commit(ADMIN_USERS_UPDATE_ERROR, err)
+                        reject(err)
+                    })
+            })
         },
 
     },
@@ -600,20 +600,20 @@ const Login = Vue.component('login', {
     template: '#login-template',
     computed: {
         isAuthError() {
-            return this.$store.getters.authStatus === 'error'
+            return store.getters.authStatus === 'error'
         }
     },
     methods: {
         login: function () {
             const {username, password} = this
-            this.$store.dispatch(AUTH_REQUEST, {username, password}).then(() => {
-                this.$router.push('/report')
+            store.dispatch(AUTH_REQUEST, {username, password}).then(() => {
+                router.push('/report')
             }).catch(err => {
                 console.log(err)
-            });
+            })
         }
     }
-});
+})
 
 const Register = Vue.component('register', {
     data() {
@@ -628,19 +628,19 @@ const Register = Vue.component('register', {
     methods: {
         register: function () {
             const {email, username, password, preferred_working_hours} = this
-            this.$store.dispatch(AUTH_REGISTER, {email, username, password, preferred_working_hours}).then(() => {
-                this.$router.push('/register_status')
+            store.dispatch(AUTH_REGISTER, {email, username, password, preferred_working_hours}).then(() => {
+                router.push('/register_status')
             }).catch(err => {
                 console.log(err.response.data)
-            });
+            })
         }
     },
     computed: {
         registerError() {
-            return this.$store.getters.registerStatus === 'error'
+            return store.getters.registerStatus === 'error'
         }
     },
-});
+})
 
 const Logout = Vue.component('logout', {
     data() {
@@ -649,13 +649,13 @@ const Logout = Vue.component('logout', {
     template: '#logout-template',
     methods: {
         logout: function () {
-            this.$store.dispatch(AUTH_LOGOUT);
+            store.dispatch(AUTH_LOGOUT)
         }
     },
     beforeMount() {
         this.logout()
     }
-});
+})
 
 const RegisterStatus = Vue.component('register-status', {
     data() {
@@ -664,10 +664,10 @@ const RegisterStatus = Vue.component('register-status', {
     template: '#register-status-template',
     computed: {
         isRegistered() {
-            return this.$store.getters.registerStatus === 'registered'
+            return store.getters.registerStatus === 'registered'
         }
     },
-});
+})
 
 const Timesheet = Vue.component('timesheet', {
     data() {
@@ -676,7 +676,7 @@ const Timesheet = Vue.component('timesheet', {
             description: "",
             duration: null,
             timesheet: [],
-            preferredWorkingHours: this.$store.getters.preferredWorkingHours,
+            preferredWorkingHours: store.getters.preferredWorkingHours,
             attributes: [
                 {
                     key: 'today',
@@ -688,35 +688,35 @@ const Timesheet = Vue.component('timesheet', {
     methods: {
         refresh_logged_work: function () {
             let {workday} = this
-            workday = workday.toISOString().substring(0, 10);
-            this.$store.dispatch(TIMESHEET_LOAD, {workday}).then((resp) => {
+            workday = workday.toISOString().substring(0, 10)
+            store.dispatch(TIMESHEET_LOAD, {workday}).then((resp) => {
                 this.timesheet = resp.data
             }).catch(err => {
                 console.log(err)
-            });
+            })
         },
         log_work: function () {
             let {workday, description, duration} = this
-            workday = workday.toISOString().substring(0, 10);
-            this.$store.dispatch(TIMESHEET_LOG_WORK, {workday, description, duration}).then(() => {
+            workday = workday.toISOString().substring(0, 10)
+            store.dispatch(TIMESHEET_LOG_WORK, {workday, description, duration}).then(() => {
                 this.refresh_logged_work()
                 this.description = ""
                 this.duration = null
             }).catch(err => {
                 console.log(err)
-            });
+            })
         },
         delete_work: function (work) {
             console.log(work)
-            this.$store.dispatch(TIMESHEET_DELETE_WORK, {id: work.id}).then(() => {
+            store.dispatch(TIMESHEET_DELETE_WORK, {id: work.id}).then(() => {
                 this.refresh_logged_work()
             }).catch(err => {
                 console.log(err)
-            });
+            })
         },
         update_work: function (work) {
             console.log(work)
-            this.$store.dispatch(TIMESHEET_UPDATE_WORK, {
+            store.dispatch(TIMESHEET_UPDATE_WORK, {
                 id: work.id,
                 workday: work.workday,
                 description: work.description,
@@ -725,13 +725,13 @@ const Timesheet = Vue.component('timesheet', {
                 this.refresh_logged_work()
             }).catch(err => {
                 console.log(err)
-            });
+            })
         }
     },
     template: '#timesheet-template',
     computed: {
         highlight_hours: function () {
-            let prefHours = this.$store.getters.preferredWorkingHours
+            let prefHours = store.getters.preferredWorkingHours
             let totalHours = 0
             for (let i = 0; i < this.timesheet.length; i++) {
                 totalHours += this.timesheet[i].duration
@@ -742,11 +742,11 @@ const Timesheet = Vue.component('timesheet', {
     beforeMount: function () {
         this.refresh_logged_work()
     }
-});
+})
 
 Date.prototype.addDays = function (days) {
-    var date = new Date(this.valueOf());
-    date.setDate(date.getDate() + days);
+    var date = new Date(this.valueOf())
+    date.setDate(date.getDate() + days)
     return date;
 }
 const Report = Vue.component('report', {
@@ -760,10 +760,10 @@ const Report = Vue.component('report', {
     methods: {
         refresh_report: function () {
             let {startdate, enddate} = this
-            let start = startdate.toISOString().substring(0, 10);
-            let end = enddate.toISOString().substring(0, 10);
+            let start = startdate.toISOString().substring(0, 10)
+            let end = enddate.toISOString().substring(0, 10)
             console.log(start, end)
-            this.$store.dispatch(REPORT_LOAD, {start, end}).then((resp) => {
+            store.dispatch(REPORT_LOAD, {start, end}).then((resp) => {
 
                 grouped_data = {}
                 for (let i = 0; i < resp.data.length; i++) {
@@ -789,7 +789,7 @@ const Report = Vue.component('report', {
                 console.log(start, end, grouped_data)
             }).catch(err => {
                 console.log(err)
-            });
+            })
         }
     },
     template: '#report-template',
@@ -797,15 +797,15 @@ const Report = Vue.component('report', {
     beforeMount: function () {
         this.refresh_report()
     }
-});
+})
 
 const Profile = Vue.component('profile', {
     data() {
         return {
-            username: this.$store.getters.username,
+            username: store.getters.username,
             password: "",
-            email: this.$store.getters.email,
-            preferred_working_hours: this.$store.getters.preferredWorkingHours,
+            email: store.getters.email,
+            preferred_working_hours: store.getters.preferredWorkingHours,
         };
     },
     template: '#profile-template',
@@ -813,7 +813,7 @@ const Profile = Vue.component('profile', {
         update_profile: function () {
             let {username, password, email, preferred_working_hours} = this
             console.log({username, password, email, preferred_working_hours})
-            this.$store.dispatch(PROFILE_UPDATE, {
+            store.dispatch(PROFILE_UPDATE, {
                 username: username.trim(),
                 email: email.trim(),
                 password: password.trim(),
@@ -822,27 +822,27 @@ const Profile = Vue.component('profile', {
 
             }).catch(err => {
                 console.log(err)
-            });
+            })
         },
         delete_user: function () {
             if (confirm("Do you really want to delete?")) {
-                this.$store.dispatch(AUTH_DELETE, {}).then(() => {
-                    this.$router.push('/logout')
+                store.dispatch(AUTH_DELETE, {}).then(() => {
+                    router.push('/logout')
                 }).catch(err => {
                     console.log(err.response.data)
-                });
+                })
             }
         }
     },
     computed: {
         hasUpdateError() {
-            return this.$store.getters.appStatus === 'profile_update_error'
+            return store.getters.appStatus === 'profile_update_error'
         },
         updateSucceeded() {
-            return this.$store.getters.appStatus === 'profile_updated'
+            return store.getters.appStatus === 'profile_updated'
         }
     },
-});
+})
 
 const UsersAdmin = Vue.component('UsersAdminComponent', {
     data() {
@@ -853,32 +853,32 @@ const UsersAdmin = Vue.component('UsersAdminComponent', {
     template: '#users-admin-template',
     methods: {
         refresh_users_data: function () {
-            this.$store.dispatch(ADMIN_USERS_LOAD, {}).then((resp) => {
+            store.dispatch(ADMIN_USERS_LOAD, {}).then((resp) => {
                 this.users = resp.data
                 console.log(this.users)
             }).catch(err => {
                 console.log(err)
-            });
+            })
         },
         admin_delete_user: function (user) {
             if (confirm("Do you really want to delete?")) {
-                this.$store.dispatch(ADMIN_USERS_DELETE, user).then(() => {
-                    if (this.$store.getters.username === user.username) {
-                        this.$router.push('/logout')
+                store.dispatch(ADMIN_USERS_DELETE, user).then(() => {
+                    if (store.getters.username === user.username) {
+                        router.push('/logout')
                     } else {
                         this.refresh_users_data()
                     }
                 }).catch(err => {
                     console.log(err.response.data)
-                });
+                })
             }
         },
         admin_update_user: function (user) {
-            this.$store.dispatch(ADMIN_USERS_UPDATE, user).then(() => {
+            store.dispatch(ADMIN_USERS_UPDATE, user).then(() => {
                 this.refresh_users_data()
             }).catch(err => {
                 console.log(err.response.data)
-            });
+            })
         }
     },
     computed: {
@@ -894,7 +894,7 @@ const UsersAdmin = Vue.component('UsersAdminComponent', {
     beforeMount: function () {
         this.refresh_users_data()
     }
-});
+})
 
 
 const TimesheetsAdmin = Vue.component('TimesheetsAdminComponent', {
@@ -906,23 +906,23 @@ const TimesheetsAdmin = Vue.component('TimesheetsAdminComponent', {
     template: '#timesheets-admin-template',
     methods: {
         refresh_timesheets_data: function () {
-            this.$store.dispatch(ADMIN_TIMESHEET_LOAD, {}).then((resp) => {
+            store.dispatch(ADMIN_TIMESHEET_LOAD, {}).then((resp) => {
                 this.timesheets = resp.data
             }).catch(err => {
                 console.log(err)
-            });
+            })
         },
         admin_delete_work: function (work) {
             if (confirm("Do you really want to delete?")) {
-                this.$store.dispatch(ADMIN_TIMESHEET_DELETE, {id: work.id}).then(() => {
+                store.dispatch(ADMIN_TIMESHEET_DELETE, {id: work.id}).then(() => {
                     this.refresh_timesheets_data()
                 }).catch(err => {
                     console.log(err.response.data)
-                });
+                })
             }
         },
         admin_update_work: function (work) {
-            this.$store.dispatch(ADMIN_WORK_UPDATE, {
+            store.dispatch(ADMIN_WORK_UPDATE, {
                 id: work.id,
                 workday: work.workday,
                 description: work.description,
@@ -931,7 +931,7 @@ const TimesheetsAdmin = Vue.component('TimesheetsAdminComponent', {
                 this.refresh_timesheets_data()
             }).catch(err => {
                 console.log(err)
-            });
+            })
         },
     },
     computed: {
@@ -947,17 +947,17 @@ const TimesheetsAdmin = Vue.component('TimesheetsAdminComponent', {
     beforeMount: function () {
         this.refresh_timesheets_data()
     }
-});
+})
 
 
 const NotFoundComponent = Vue.component('NotFoundComponent', {
     data() {
-        return {};
+        return {}
     },
     template: '#NotFoundComponent-template',
     methods: {},
     computed: {},
-});
+})
 
 
 // router
@@ -1069,13 +1069,16 @@ const mainApp = new Vue({
     store,
     computed: {
         isAuthenticated() {
-            return this.$store.getters.isAuthenticated
+            return store.getters.isAuthenticated
         },
         isStaff() {
-            return this.$store.getters.is_staff
+            return store.getters.is_staff
         },
         isSuperuser() {
-            return this.$store.getters.is_superuser
+            return store.getters.is_superuser
+        },
+        currentuser() {
+            return store.getters.username
         },
     },
-}).$mount('#app');
+}).$mount('#app')

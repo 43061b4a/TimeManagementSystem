@@ -8,6 +8,8 @@ rm -r timesheets/migrations
 python manage.py makemigrations timesheets
 python manage.py migrate
 echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('superadmin', 'superadmin@myproject.com', 'password123')" | python manage.py shell
+echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_user('admin', 'admin@myproject.com', 'password123',is_staff=True)" | python manage.py shell
+echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_user('user', 'user@myproject.com', 'password123')" | python manage.py shell
 python manage.py runserver
 ```
 

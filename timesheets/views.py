@@ -11,7 +11,7 @@ from rest_framework.reverse import reverse
 from rest_framework.views import APIView
 
 from timesheets.models import Work, Profile
-from timesheets.serializers import WorkSerializer, UserSerializer, UserRootSerializer
+from timesheets.serializers import WorkSerializer, UserSerializer, UserAdminSerializer
 
 
 def set_if_not_none(mapping, key, value):
@@ -51,12 +51,12 @@ class WorkList(generics.ListCreateAPIView):
     def perform_create(self, serializer):
         current_user = User.objects.get(username=self.request.user)
         if current_user.is_superuser or current_user.is_staff:
-            given_user = self.request.GET.get('username', None)
-            if given_user:
+            if 'owner' in self.request.data:
+                given_user = self.request.data['owner']
                 current_user = User.objects.get(username=given_user)
             serializer.save(owner=current_user)
         else:
-            serializer.save(owner=self.request.user)
+            serializer.save(owner=current_user)
 
 
 class WorkDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -91,7 +91,7 @@ class UserList(APIView):
         else:
             users = User.objects.filter(username=current_user.username)
 
-        serializer = UserRootSerializer(users, many=True)
+        serializer = UserAdminSerializer(users, many=True)
         return Response(serializer.data)
 
 
@@ -113,16 +113,21 @@ class UserDetail(APIView):
 
     def get(self, request, pk, format=None):
         user = self.get_object(pk)
-        serializer = UserRootSerializer(user)
+        serializer = UserAdminSerializer(user)
         return Response(serializer.data)
 
     def put(self, request, pk, format=None):
         user = self.get_object(pk)
+        current_user = User.objects.get(username=self.request.user)
 
-        if 'password' not in request.data or request.data['password'] is None:
+        if current_user.id != user.id and current_user.is_superuser == False:
+            return Response('User not authorised', status=status.HTTP_400_BAD_REQUEST)
+
+        if 'password' in request.data and request.data['password'] == '':
+            user.set_password(request.data['password'])
+        else:
             request.data['password'] = user.password
 
-        current_user = User.objects.get(username=self.request.user)
         if not current_user.is_superuser:
             if 'is_staff' in request.data:
                 del request.data['is_staff']
@@ -130,7 +135,7 @@ class UserDetail(APIView):
             if 'is_superuser' in request.data:
                 del request.data['is_superuser']
 
-        serializer = UserRootSerializer(user, data=request.data)
+        serializer = UserAdminSerializer(user, data=request.data)
 
         if serializer.is_valid():
             serializer.save()

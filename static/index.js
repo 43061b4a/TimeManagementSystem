@@ -53,6 +53,10 @@ const ADMIN_WORK_UPDATE = "ADMIN_WORK_UPDATE"
 const ADMIN_WORK_UPDATE_SUCCESS = "ADMIN_WORK_UPDATE_SUCCESS"
 const ADMIN_WORK_UPDATE_ERROR = "ADMIN_WORK_UPDATE_ERROR"
 
+const ADMIN_WORK_CREATE = "ADMIN_WORK_CREATE"
+const ADMIN_WORK_CREATE_SUCCESS = "ADMIN_WORK_CREATE_SUCCESS"
+const ADMIN_WORK_CREATE_ERROR = "ADMIN_WORK_CREATE_ERROR"
+
 const ADMIN_USERS_LOAD = "ADMIN_USERS_LOAD"
 const ADMIN_USERS_LOAD_SUCCESS = "ADMIN_USERS_LOAD_SUCCESS"
 const ADMIN_USERS_LOAD_ERROR = "ADMIN_USERS_LOAD_ERROR"
@@ -390,6 +394,23 @@ const store = new Vuex.Store({
                     })
                     .catch(err => {
                         commit(ADMIN_USERS_UPDATE_ERROR, err)
+                        reject(err)
+                    })
+            })
+        },
+
+        [ADMIN_WORK_CREATE]: ({commit, dispatch, getters}, work) => {
+            console.log(work)
+            return new Promise((resolve, reject) => {
+                commit(ADMIN_WORK_CREATE)
+                axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
+                axios.post(TIMESHEET_RESOURCE_URL, work)
+                    .then(resp => {
+                        commit(ADMIN_WORK_CREATE_SUCCESS, resp)
+                        resolve(resp)
+                    })
+                    .catch(err => {
+                        commit(ADMIN_WORK_CREATE_ERROR, err)
                         reject(err)
                     })
             })
@@ -900,6 +921,10 @@ const UsersAdmin = Vue.component('UsersAdminComponent', {
 const TimesheetsAdmin = Vue.component('TimesheetsAdminComponent', {
     data() {
         return {
+            workday: new Date(new Date().setHours(0, 0, 0, 0)),
+            description: "",
+            duration: null,
+            owner: "",
             timesheets: []
         };
     },
@@ -908,6 +933,18 @@ const TimesheetsAdmin = Vue.component('TimesheetsAdminComponent', {
         refresh_timesheets_data: function () {
             store.dispatch(ADMIN_TIMESHEET_LOAD, {}).then((resp) => {
                 this.timesheets = resp.data
+            }).catch(err => {
+                console.log(err)
+            })
+        },
+        admin_log_work: function () {
+            let {workday, description, duration, owner} = this
+            workday = workday.toISOString().substring(0, 10)
+            store.dispatch(TIMESHEET_LOG_WORK, {workday, description, duration, owner}).then(() => {
+                this.description = ""
+                this.duration = null
+                this.owner = ""
+                this.refresh_timesheets_data()
             }).catch(err => {
                 console.log(err)
             })
@@ -926,7 +963,8 @@ const TimesheetsAdmin = Vue.component('TimesheetsAdminComponent', {
                 id: work.id,
                 workday: work.workday,
                 description: work.description,
-                duration: work.duration
+                duration: work.duration,
+                owner: work.owner
             }).then(() => {
                 this.refresh_timesheets_data()
             }).catch(err => {

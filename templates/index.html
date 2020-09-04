@@ -10,10 +10,16 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
           integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
 
+    <link rel="stylesheet" type="text/css" media="screen" href="{% static "style.css" %}"/>
+
     <title>Time Management System</title>
     <style type="text/css">
         .router-link-active {
             color: #f2f2f2 !important;
+        }
+
+        [v-cloak] {
+            display: none;
         }
     </style>
 </head>
@@ -21,41 +27,43 @@
 <div class="bg-white container pb-1">
     <!-- Content -->
     <div id="app">
-        <nav class="navbar navbar-expand-lg navbar-dark bg-primary pt-1">
+        <div v-cloak>
             {% verbatim %}
-            <router-link v-bind:to="'report'" class="navbar-brand">Time Management System <br/>
-                <span v-if="currentuser" class="text-warning small">Welcome {{ currentuser }}!</span>
-            </router-link>
+            <nav class="navbar navbar-expand-lg navbar-dark bg-primary pt-1">
+                <router-link v-bind:to="'report'" class="navbar-brand">Time Management System <br/>
+                    <span v-if="currentuser" class="text-warning small">Logged in as {{ currentuser }}</span>
+                </router-link>
+                <ul class="navbar-nav ml-auto" v-if="isAuthenticated">
+                    <li class="nav-item" v-if="isSuperuser || isStaff">
+                        <router-link to="/manage-timesheets" class="nav-link my-2">All Timesheets</router-link>
+                    </li>
+                    <li class="nav-item" v-if="isSuperuser">
+                        <router-link to="/manage-users" class="nav-link my-2">All Users</router-link>
+                    </li>
+                    <li class="nav-item">
+                        <router-link to="/timesheet" class="nav-link my-2">My Timesheet</router-link>
+                    </li>
+                    <li>
+                        <router-link to="/profile" class="nav-link my-2">My Profile</router-link>
+                    </li>
+                    <li>
+                        <router-link to="/logout" class="btn btn-warning my-2">Logout</router-link>
+                    </li>
+                </ul>
+            </nav>
             {% endverbatim %}
-            <ul class="navbar-nav ml-auto" v-if="isAuthenticated">
-                <li class="nav-item" v-if="isSuperuser || isStaff">
-                    <router-link to="/manage-timesheets" class="nav-link my-2">All Timesheets</router-link>
-                </li>
-                <li class="nav-item" v-if="isSuperuser">
-                    <router-link to="/manage-users" class="nav-link my-2">All Users</router-link>
-                </li>
-                <li class="nav-item">
-                    <router-link to="/timesheet" class="nav-link my-2">My Timesheet</router-link>
-                </li>
-                <li>
-                    <router-link to="/profile" class="nav-link my-2">My Profile</router-link>
-                </li>
-                <li>
-                    <router-link to="/logout" class="btn btn-warning my-2">Logout</router-link>
-                </li>
-            </ul>
-        </nav>
-        <section class="jumbotron text-center" v-if="!isAuthenticated">
-            <div class="container my-2">
-                <h1 class="jumbotron-heading">Time Management System</h1>
-                <p class="lead text-muted">Please login or register to continue.</p>
-                <p>
-                    <router-link to="/login" class="btn btn-primary my-2">Login</router-link>
-                    <router-link to="/register" class="btn btn-secondary my-2">Register</router-link>
-                </p>
-            </div>
-        </section>
-        <router-view></router-view>
+            <section class="jumbotron text-center" v-if="!isAuthenticated">
+                <div class="container my-2">
+                    <h1 class="jumbotron-heading">Time Management System</h1>
+                    <p class="lead text-muted">Please login or register to continue.</p>
+                    <p>
+                        <router-link to="/login" class="btn btn-primary my-2">Login</router-link>
+                        <router-link to="/register" class="btn btn-secondary my-2">Register</router-link>
+                    </p>
+                </div>
+            </section>
+            <router-view></router-view>
+        </div>
     </div>
 </div>
 
@@ -206,7 +214,7 @@
 
 <template id="report-template">
     <div class="timesheet-report">
-        <div class="page-header my-2">
+        <div class="pb-2 mt-4 mb-2 border-bottom">
             <h1>
                 Timesheet Report
             </h1>
@@ -263,7 +271,7 @@
 
 <template id="profile-template">
     <div class="profile">
-        <div class="page-header my-2">
+        <div class="pb-2 mt-4 mb-2 border-bottom">
             <h1>
                 Profile
             </h1>
@@ -308,7 +316,7 @@
 
 <template id="timesheets-admin-template">
     <div class="timesheets-admin">
-        <div class="page-header my-2">
+        <div class="pb-2 mt-4 mb-2 border-bottom">
             <h1>
                 Timesheets Admin
             </h1>
@@ -333,19 +341,35 @@
                 <div class="form-group col-md-6">
                     Description
                 </div>
+            </div>
+            <div class="form-row">
                 <div class="form-group col-md-1">
-                    Update
+                    <input required type="text" v-model="owner" class="form-control" placeholder="Owner">
                 </div>
                 <div class="form-group col-md-1">
-                    Delete
+                    <input required type="text" v-model="duration" class="form-control" placeholder="Duration">
+                </div>
+                <div class="form-group col-md-2">
+                    <v-date-picker v-model='workday'
+                                   :input-props='{ class: "form-control", readonly: true }'></v-date-picker>
+                </div>
+                <div class="form-group col-md-6">
+                    <input required type="text" v-model="description" class="form-control"
+                           placeholder="Work description">
+                </div>
+                <div class="form-group col-md-2">
+                    <button type="submit" name="work_log" text="Register"
+                            class="form-control btn btn-primary" @click="admin_log_work">Log Work
+                    </button>
                 </div>
             </div>
             <template v-for="log in timesheets">
                 <div class="form-row">
-                    <div class="form-group col-md-1">
-                        <input required type="text" class="form-control align-top" placeholder="Owner"
-                               v-model="log.owner">
+                    {% verbatim %}
+                    <div class="form-group col-md-1 mt-2 small text-info font-weight-bold">
+                        <span>{{ log.owner }}</span>
                     </div>
+                    {% endverbatim %}
                     <div class="form-group col-md-1">
                         <input required type="text" class="form-control align-top" placeholder="Work duration"
                                v-model="log.duration">
@@ -388,7 +412,7 @@
 
 <template id="users-admin-template">
     <div class="users-admin">
-        <div class="page-header my-2">
+        <div class="pb-2 mt-4 mb-2 border-bottom">
             <h1>
                 Users Admin
             </h1>

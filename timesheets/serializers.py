@@ -19,7 +19,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ['preferred_working_hours']
 
 
-class UserRootSerializer(serializers.ModelSerializer):
+class UserAdminSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer()
 
     class Meta:
@@ -34,7 +34,6 @@ class UserRootSerializer(serializers.ModelSerializer):
             instance.is_superuser = validated_data.pop('is_superuser')
         instance.username = validated_data.pop('username')
         instance.email = validated_data.pop('email')
-        instance.set_password(validated_data.pop('password'))
         instance.save()
 
         if 'profile' in validated_data and validated_data['profile']['preferred_working_hours'] > 0:

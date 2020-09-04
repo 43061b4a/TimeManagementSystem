@@ -141,7 +141,6 @@ const store = new Vuex.Store({
         [AUTH_REGISTER]: ({commit, dispatch}, user) => {
             user["profile"] = {"preferred_working_hours": parseInt(user["preferred_working_hours"])}
             delete user["preferred_working_hours"]
-            console.log(user)
             return new Promise((resolve, reject) => {
                 commit(AUTH_REGISTER)
                 axios.post(REGISTER_URL, user)
@@ -157,7 +156,6 @@ const store = new Vuex.Store({
         },
 
         [TIMESHEET_LOG_WORK]: ({commit, dispatch, getters}, work_log) => {
-            console.log(work_log)
             return new Promise((resolve, reject) => {
                 commit(TIMESHEET_LOG_WORK)
                 axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
@@ -174,7 +172,6 @@ const store = new Vuex.Store({
         },
 
         [TIMESHEET_LOAD]: ({commit, dispatch, getters}, workday) => {
-            console.log(workday)
             return new Promise((resolve, reject) => {
                 commit(TIMESHEET_LOAD)
                 axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
@@ -191,7 +188,6 @@ const store = new Vuex.Store({
         },
 
         [TIMESHEET_DELETE_WORK]: ({commit, dispatch, getters}, id) => {
-            console.log(id)
             return new Promise((resolve, reject) => {
                 commit(TIMESHEET_LOAD)
                 axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
@@ -208,7 +204,6 @@ const store = new Vuex.Store({
         },
 
         [TIMESHEET_UPDATE_WORK]: ({commit, dispatch, getters}, work) => {
-            console.log(work)
             return new Promise((resolve, reject) => {
                 commit(TIMESHEET_UPDATE_WORK)
                 axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
@@ -226,8 +221,6 @@ const store = new Vuex.Store({
 
         [REPORT_LOAD]: ({commit, dispatch, getters}, dates) => {
             const {start, end} = dates
-            console.log(dates)
-            console.log(start, end)
             return new Promise((resolve, reject) => {
                 commit(REPORT_LOAD)
                 axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
@@ -244,7 +237,6 @@ const store = new Vuex.Store({
         },
 
         [PROFILE_UPDATE]: ({commit, dispatch, getters}, user) => {
-            console.log(user)
             if (user.password === "") {
                 delete user['password']
             }
@@ -307,7 +299,6 @@ const store = new Vuex.Store({
         },
 
         [ADMIN_TIMESHEET_DELETE]: ({commit, dispatch, getters}, id) => {
-            console.log(id)
             return new Promise((resolve, reject) => {
                 commit(ADMIN_TIMESHEET_DELETE)
                 axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
@@ -324,7 +315,6 @@ const store = new Vuex.Store({
         },
 
         [ADMIN_WORK_UPDATE]: ({commit, dispatch, getters}, work) => {
-            console.log(work)
             return new Promise((resolve, reject) => {
                 commit(ADMIN_WORK_UPDATE)
                 axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
@@ -374,7 +364,6 @@ const store = new Vuex.Store({
 
 
         [ADMIN_USERS_UPDATE]: ({commit, dispatch, getters}, user) => {
-            console.log(user)
             if (user.password === "") {
                 delete user['password']
             }
@@ -400,7 +389,6 @@ const store = new Vuex.Store({
         },
 
         [ADMIN_WORK_CREATE]: ({commit, dispatch, getters}, work) => {
-            console.log(work)
             return new Promise((resolve, reject) => {
                 commit(ADMIN_WORK_CREATE)
                 axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
@@ -728,7 +716,6 @@ const Timesheet = Vue.component('timesheet', {
             })
         },
         delete_work: function (work) {
-            console.log(work)
             store.dispatch(TIMESHEET_DELETE_WORK, {id: work.id}).then(() => {
                 this.refresh_logged_work()
             }).catch(err => {
@@ -736,7 +723,6 @@ const Timesheet = Vue.component('timesheet', {
             })
         },
         update_work: function (work) {
-            console.log(work)
             store.dispatch(TIMESHEET_UPDATE_WORK, {
                 id: work.id,
                 workday: work.workday,
@@ -783,10 +769,8 @@ const Report = Vue.component('report', {
             let {startdate, enddate} = this
             let start = startdate.toISOString().substring(0, 10)
             let end = enddate.toISOString().substring(0, 10)
-            console.log(start, end)
             store.dispatch(REPORT_LOAD, {start, end}).then((resp) => {
-
-                grouped_data = {}
+                let grouped_data = {}
                 for (let i = 0; i < resp.data.length; i++) {
                     if (!grouped_data[resp.data[i].workday]) {
                         grouped_data[resp.data[i].workday] = {
@@ -803,11 +787,8 @@ const Report = Vue.component('report', {
                             descriptionCombined: descriptionCombined
                         }
                     }
-                    const {totalHours, descriptionCombined} = grouped_data[resp.data[i].workday];
-                    console.log(totalHours, descriptionCombined)
                 }
                 this.timesheet = grouped_data
-                console.log(start, end, grouped_data)
             }).catch(err => {
                 console.log(err)
             })
@@ -833,7 +814,6 @@ const Profile = Vue.component('profile', {
     methods: {
         update_profile: function () {
             let {username, password, email, preferred_working_hours} = this
-            console.log({username, password, email, preferred_working_hours})
             store.dispatch(PROFILE_UPDATE, {
                 username: username.trim(),
                 email: email.trim(),
@@ -876,7 +856,6 @@ const UsersAdmin = Vue.component('UsersAdminComponent', {
         refresh_users_data: function () {
             store.dispatch(ADMIN_USERS_LOAD, {}).then((resp) => {
                 this.users = resp.data
-                console.log(this.users)
             }).catch(err => {
                 console.log(err)
             })

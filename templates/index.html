@@ -30,8 +30,8 @@
         <div v-cloak>
             {% verbatim %}
             <nav class="navbar navbar-expand-lg navbar-dark bg-primary pt-1">
-                <router-link v-bind:to="'report'" class="navbar-brand">Time Management System <br/>
-                    <span v-if="currentuser" class="text-warning small">Logged in as {{ currentuser }}</span>
+                <router-link v-bind:to="'report'" class="navbar-brand" v-if="currentuser">Time Management System <br/>
+                    <span class="text-warning small">Logged in as {{ currentuser }}</span>
                 </router-link>
                 <ul class="navbar-nav ml-auto" v-if="isAuthenticated">
                     <li class="nav-item" v-if="isSuperuser || isStaff">
@@ -149,12 +149,11 @@
 {% verbatim %}
 <template id="timesheet-template">
     <div class="timesheet my-2">
-        <div class="page-header">
+        <div class="pb-2 mt-4 mb-2 border-bottom">
             <h1>
                 Timesheet
             </h1>
             <small class="text-muted">Your Preferred Working Hours: <span>{{ preferredWorkingHours }}</span></small>
-            <hr/>
         </div>
         <form @submit.prevent="log_work">
             <div class="form-group">

@@ -61,6 +61,10 @@ const ADMIN_USERS_DELETE = "ADMIN_USERS_DELETE"
 const ADMIN_USERS_DELETE_SUCCESS = "ADMIN_USERS_DELETE_SUCCESS"
 const ADMIN_USERS_DELETE_ERROR = "ADMIN_USERS_DELETE_ERROR"
 
+const ADMIN_USERS_UPDATE = "ADMIN_USERS_UPDATE"
+const ADMIN_USERS_UPDATE_SUCCESS = "ADMIN_USERS_UPDATE_SUCCESS"
+const ADMIN_USERS_UPDATE_ERROR = "ADMIN_USERS_UPDATE_ERROR"
+
 // store
 const store = new Vuex.Store({
     state: {
@@ -74,12 +78,14 @@ const store = new Vuex.Store({
         status: '',
         registered: '',
         appStatus: '',
+        adminAppStatus: ''
     },
     getters: {
         isAuthenticated: state => !!state.token,
         authStatus: state => state.status,
         registerStatus: state => state.registered,
         appStatus: state => state.appStatus,
+        adminAppStatus: state => state.adminAppStatus,
         authToken: state => state.token,
         preferredWorkingHours: state => state.preferred_working_hours,
         email: state => state.email,
@@ -362,185 +368,223 @@ const store = new Vuex.Store({
             });
         },
 
+
+        [ADMIN_USERS_UPDATE]: ({commit, dispatch, getters}, user) => {
+            console.log(user);
+            if (user.password === "") {
+                delete user['password']
+            }
+
+            return new Promise((resolve, reject) => {
+                commit(ADMIN_USERS_UPDATE);
+                axios.defaults.headers.common['Authorization'] = `Token ${getters.authToken}`;
+                axios.put(USERS_RESOURCE_URL + `${user.id}/`, user)
+                    .then(resp => {
+                        commit(ADMIN_USERS_UPDATE_SUCCESS, resp);
+                        if (getters.userid === user.id) {
+                            localStorage.setItem("preferred_working_hours", resp.data.profile.preferred_working_hours);
+                            localStorage.setItem("email", resp.data.email);
+                            localStorage.setItem("username", resp.data.username);
+                        }
+                        resolve(resp);
+                    })
+                    .catch(err => {
+                        commit(ADMIN_USERS_UPDATE_ERROR, err);
+                        reject(err);
+                    });
+            });
+        },
+
     },
     mutations: {
         [AUTH_REQUEST]: state => {
-            state.status = "loading";
+            state.status = "loading"
         },
         [AUTH_SUCCESS]: (state, resp) => {
-            state.status = "success";
-            state.token = resp.data.token;
-            state.preferred_working_hours = resp.data.preferred_working_hours;
-            state.email = resp.data.email;
-            state.username = resp.data.username;
-            state.userid = resp.data.user_id;
-            state.is_superuser = resp.data.is_superuser;
-            state.is_staff = resp.data.is_staff;
+            state.status = "success"
+            state.token = resp.data.token
+            state.preferred_working_hours = resp.data.preferred_working_hours
+            state.email = resp.data.email
+            state.username = resp.data.username
+            state.userid = resp.data.user_id
+            state.is_superuser = resp.data.is_superuser
+            state.is_staff = resp.data.is_staff
         },
         [AUTH_ERROR]: state => {
-            state.status = "error";
+            state.status = "error"
         },
         [AUTH_LOGOUT]: state => {
-            state.token = "";
-            state.preferred_working_hours = "";
-            state.email = "";
-            state.username = "";
-            state.userid = "";
-            state.is_superuser = "";
-            state.is_staff = "";
+            state.token = ""
+            state.preferred_working_hours = ""
+            state.email = ""
+            state.username = ""
+            state.userid = ""
+            state.is_superuser = ""
+            state.is_staff = ""
         },
         [AUTH_REGISTER]: state => {
-            state.registered = "registering";
+            state.registered = "registering"
         },
         [AUTH_REGISTER_ERROR]: (state, err) => {
-            state.registered = "error";
-            state.registration_errors = err;
+            state.registered = "error"
+            state.registration_errors = err
         },
         [AUTH_REGISTER_SUCCESS]: (state, resp) => {
-            state.registered = "registered";
-            state.registration_errors = "";
+            state.registered = "registered"
+            state.registration_errors = ""
         },
         [TIMESHEET_LOG_WORK]: state => {
-            state.appStatus = "logging_work";
+            state.appStatus = "logging_work"
         },
         [TIMESHEET_LOG_WORK_ERROR]: (state, err) => {
-            state.appStatus = "work_log_error";
-            state.error = err;
+            state.appStatus = "work_log_error"
+            state.error = err
         },
         [TIMESHEET_LOG_WORK_SUCCESS]: (state, resp) => {
-            state.appStatus = "work_logged";
-            state.error = "";
+            state.appStatus = "work_logged"
+            state.error = ""
         },
         [TIMESHEET_LOAD]: state => {
-            state.appStatus = "loading_timesheet_data";
+            state.appStatus = "loading_timesheet_data"
         },
         [TIMESHEET_LOAD_ERROR]: (state, err) => {
-            state.appStatus = "loading_timesheet_data_error";
-            state.error = err;
+            state.appStatus = "loading_timesheet_data_error"
+            state.error = err
         },
         [TIMESHEET_LOAD_SUCCESS]: (state, resp) => {
-            state.appStatus = "loading_timesheet_data_success";
-            state.error = "";
+            state.appStatus = "loading_timesheet_data_success"
+            state.error = ""
         },
         [TIMESHEET_DELETE_WORK]: state => {
-            state.appStatus = "deleting_work";
+            state.appStatus = "deleting_work"
         },
         [TIMESHEET_DELETE_WORK_ERROR]: (state, err) => {
-            state.appStatus = "work_delete_error";
-            state.error = err;
+            state.appStatus = "work_delete_error"
+            state.error = err
         },
         [TIMESHEET_DELETE_WORK_SUCCESS]: (state, resp) => {
-            state.appStatus = "work_deleted";
-            state.error = "";
+            state.appStatus = "work_deleted"
+            state.error = ""
         },
         [TIMESHEET_UPDATE_WORK]: state => {
-            state.appStatus = "updating_work";
+            state.appStatus = "updating_work"
         },
         [TIMESHEET_UPDATE_WORK_ERROR]: (state, err) => {
-            state.appStatus = "work_update_error";
-            state.error = err;
+            state.appStatus = "work_update_error"
+            state.error = err
         },
         [TIMESHEET_UPDATE_WORK_SUCCESS]: (state, resp) => {
-            state.appStatus = "work_updated";
-            state.error = "";
+            state.appStatus = "work_updated"
+            state.error = ""
         },
         [REPORT_LOAD]: state => {
-            state.appStatus = "loading_report_data";
+            state.appStatus = "loading_report_data"
         },
         [REPORT_LOAD_ERROR]: (state, err) => {
-            state.appStatus = "loading_report_data_error";
-            state.error = err;
+            state.appStatus = "loading_report_data_error"
+            state.error = err
         },
         [REPORT_LOAD_SUCCESS]: (state, resp) => {
-            state.appStatus = "loading_report_data_success";
-            state.error = "";
+            state.appStatus = "loading_report_data_success"
+            state.error = ""
         },
         [PROFILE_UPDATE]: state => {
-            state.appStatus = "updating_profile";
+            state.appStatus = "updating_profile"
         },
         [PROFILE_UPDATE_ERROR]: (state, err) => {
-            state.appStatus = "profile_update_error";
-            state.error = err;
+            state.appStatus = "profile_update_error"
+            state.error = err
         },
         [PROFILE_UPDATE_SUCCESS]: (state, resp) => {
-            state.appStatus = "profile_updated";
-            state.error = "";
-            state.preferred_working_hours = resp.data.profile.preferred_working_hours;
-            state.email = resp.data.email;
-            state.username = resp.data.username;
+            state.appStatus = "profile_updated"
+            state.error = ""
+            state.preferred_working_hours = resp.data.profile.preferred_working_hours
+            state.email = resp.data.email
+            state.username = resp.data.username
         },
         [AUTH_DELETE]: state => {
-            state.appStatus = "deleting_auth";
+            state.appStatus = "deleting_auth"
         },
         [AUTH_DELETE_ERROR]: (state, err) => {
-            state.appStatus = "deleting_auth_error";
-            state.error = err;
+            state.appStatus = "deleting_auth_error"
+            state.error = err
         },
         [AUTH_DELETE_SUCCESS]: (state, resp) => {
-            state.appStatus = "auth_deleted";
-            state.error = "";
-            state.preferred_working_hours = "";
-            state.email = "";
-            state.username = "";
-            state.token = "";
-            state.userid = "";
-            state.is_superuser = "";
-            state.is_staff = "";
+            state.appStatus = "auth_deleted"
+            state.error = ""
+            state.preferred_working_hours = ""
+            state.email = ""
+            state.username = ""
+            state.token = ""
+            state.userid = ""
+            state.is_superuser = ""
+            state.is_staff = ""
         },
         [ADMIN_TIMESHEET_LOAD]: state => {
-            state.appStatus = "loading_admin_timesheet_data";
+            state.appStatus = "loading_admin_timesheet_data"
         },
         [ADMIN_TIMESHEET_LOAD_ERROR]: (state, err) => {
-            state.appStatus = "loading_admin_timesheet_error";
-            state.error = err;
+            state.appStatus = "loading_admin_timesheet_error"
+            state.error = err
         },
         [ADMIN_TIMESHEET_LOAD_SUCCESS]: (state, resp) => {
-            state.appStatus = "loading_admin_timesheet_success";
-            state.error = "";
+            state.appStatus = "loading_admin_timesheet_success"
+            state.error = ""
         },
         [ADMIN_TIMESHEET_DELETE]: state => {
-            state.appStatus = "admin_deleting_work";
+            state.appStatus = "admin_deleting_work"
         },
         [ADMIN_TIMESHEET_DELETE_ERROR]: (state, err) => {
-            state.appStatus = "admin_work_delete_error";
-            state.error = err;
+            state.adminAppStatus = "admin_work_delete_error"
+            state.error = err
         },
         [ADMIN_TIMESHEET_DELETE_SUCCESS]: (state, resp) => {
-            state.appStatus = "admin_work_deleted";
-            state.error = "";
+            state.adminAppStatus = "admin_work_deleted"
+            state.error = ""
         },
         [ADMIN_WORK_UPDATE]: state => {
-            state.appStatus = "updating_admin_work";
+            state.adminAppStatus = "updating_admin_work"
         },
         [ADMIN_WORK_UPDATE_ERROR]: (state, err) => {
-            state.appStatus = "admin_work_update_error";
-            state.error = err;
+            state.adminAppStatus = "admin_work_update_error"
+            state.error = err
         },
         [ADMIN_WORK_UPDATE_SUCCESS]: (state, resp) => {
-            state.appStatus = "admin_work_updated";
-            state.error = "";
+            state.adminAppStatus = "admin_work_updated"
+            state.error = ""
         },
         [ADMIN_USERS_LOAD]: state => {
-            state.appStatus = "loading_admin_users_data";
+            state.appStatus = "loading_admin_users_data"
         },
         [ADMIN_USERS_LOAD_ERROR]: (state, err) => {
-            state.appStatus = "loading_admin_users_error";
-            state.error = err;
+            state.appStatus = "loading_admin_users_error"
+            state.error = err
         },
         [ADMIN_USERS_LOAD_SUCCESS]: (state, resp) => {
-            state.appStatus = "loading_admin_users_success";
-            state.error = "";
+            state.appStatus = "loading_admin_users_success"
+            state.error = ""
         },
         [ADMIN_USERS_DELETE]: state => {
-            state.appStatus = "loading_admin_users_delete";
+            state.appStatus = "loading_admin_users_delete"
         },
         [ADMIN_USERS_DELETE_ERROR]: (state, err) => {
-            state.appStatus = "deletion_admin_users_error";
-            state.error = err;
+            state.adminAppStatus = "deletion_admin_users_error"
+            state.error = err
         },
         [ADMIN_USERS_DELETE_SUCCESS]: (state, resp) => {
-            state.appStatus = "deletion_admin_users_success";
-            state.error = "";
+            state.adminAppStatus = "deletion_admin_users_success"
+            state.error = ""
+        },
+        [ADMIN_USERS_UPDATE]: state => {
+            state.appStatus = "loading_admin_users_update"
+        },
+        [ADMIN_USERS_UPDATE_ERROR]: (state, err) => {
+            state.adminAppStatus = "updating_admin_users_error"
+            state.error = err
+        },
+        [ADMIN_USERS_UPDATE_SUCCESS]: (state, resp) => {
+            state.adminAppStatus = "updating_admin_users_success"
+            state.error = ""
         },
     }
 })
@@ -551,7 +595,7 @@ const Login = Vue.component('login', {
         return {
             username: "",
             password: ""
-        };
+        }
     },
     template: '#login-template',
     computed: {
@@ -828,9 +872,25 @@ const UsersAdmin = Vue.component('UsersAdminComponent', {
                     console.log(err.response.data)
                 });
             }
+        },
+        admin_update_user: function (user) {
+            this.$store.dispatch(ADMIN_USERS_UPDATE, user).then(() => {
+                this.refresh_users_data()
+            }).catch(err => {
+                console.log(err.response.data)
+            });
         }
     },
-    computed: {},
+    computed: {
+        hasUpdateError() {
+            return store.getters.adminAppStatus === 'updating_admin_users_error'
+                || store.getters.adminAppStatus === 'deletion_admin_users_error'
+        },
+        updateSucceeded() {
+            return store.getters.adminAppStatus === 'updating_admin_users_success'
+                || store.getters.adminAppStatus === 'deletion_admin_users_success'
+        }
+    },
     beforeMount: function () {
         this.refresh_users_data()
     }
@@ -874,7 +934,16 @@ const TimesheetsAdmin = Vue.component('TimesheetsAdminComponent', {
             });
         },
     },
-    computed: {},
+    computed: {
+        hasUpdateError() {
+            return store.getters.adminAppStatus === 'admin_work_delete_error'
+                || store.getters.adminAppStatus === 'admin_work_update_error'
+        },
+        updateSucceeded() {
+            return store.getters.adminAppStatus === 'admin_work_deleted'
+                || store.getters.adminAppStatus === 'admin_work_updated'
+        }
+    },
     beforeMount: function () {
         this.refresh_timesheets_data()
     }

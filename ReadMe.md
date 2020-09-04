@@ -1,6 +1,4 @@
 
-# Time Management System
-
 ![HomeScreen Image](./media/homescreen.png "Home Screen")
 
 ## About

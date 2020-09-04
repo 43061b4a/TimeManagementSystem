@@ -1,7 +1,13 @@
 
 # Time Management System
 
-## Application Initialization
+![HomeScreen Image](./media/homescreen.png "Home Screen")
+
+## About
+
+Timesheet management app based on `Django`, `Django-REST Framework` and `VueJs`.
+
+## Application Init
 ```
 rm -f db.sqlite3
 rm -r timesheets/migrations
@@ -49,5 +55,4 @@ user.is_staff = False
 user.is_admin = False
 user.is_superuser = False
 user.save()
-
 ```

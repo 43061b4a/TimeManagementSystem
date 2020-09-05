@@ -19,6 +19,9 @@ python manage.py runserver
 
 ## Useful commands:
 ```
+Tests:
+coverage run --source=timesheets ./manage.py test ; coverage report  
+
 django-admin startapp timesheets
 curl -H 'Accept: application/json; indent=4' -u admin:dimsumdim123 http://127.0.0.1:8000/users/
 

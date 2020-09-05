@@ -123,7 +123,7 @@ class UserDetail(APIView):
         if current_user.id != user.id and current_user.is_superuser == False:
             return Response('User not authorised', status=status.HTTP_400_BAD_REQUEST)
 
-        if 'password' in request.data and request.data['password'] == '':
+        if 'password' in request.data and request.data['password'] != '':
             user.set_password(request.data['password'])
         else:
             request.data['password'] = user.password

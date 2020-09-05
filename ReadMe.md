@@ -35,7 +35,7 @@ work = Work(description="Apple", duration=1,workday="2020-10-1")
 work.save()
 work = Work(description="Cat", duration=2,workday="2020-10-1")
 work.save()
-seri = TimesheetSerializer(work)
+seri = TimesheetSerializer(work)__
 seri.data
 
 from django.contrib.auth import get_user_model

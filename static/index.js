@@ -104,15 +104,7 @@ const store = new Vuex.Store({
                 commit(AUTH_REQUEST)
                 axios({url: AUTH_URL, data: user, method: "POST"})
                     .then(resp => {
-                        console.log(resp)
-                        localStorage.setItem("user-token", resp.data.token)
-                        localStorage.setItem("preferred_working_hours", resp.data.preferred_working_hours)
-                        localStorage.setItem("email", resp.data.email)
-                        localStorage.setItem("username", resp.data.username)
-                        localStorage.setItem("userid", resp.data.user_id)
-                        localStorage.setItem("is_superuser", resp.data.is_superuser)
-                        localStorage.setItem("is_staff", resp.data.is_staff)
-
+                        setLocalStorage(resp);
                         axios.defaults.headers.common['Authorization'] = "Token " + resp.data.token
                         commit(AUTH_SUCCESS, resp)
                         resolve(resp)
@@ -127,13 +119,7 @@ const store = new Vuex.Store({
         [AUTH_LOGOUT]: ({commit}) => {
             return new Promise(resolve => {
                 commit(AUTH_LOGOUT)
-                localStorage.removeItem("user-token")
-                localStorage.removeItem("preferred_working_hours")
-                localStorage.removeItem("email")
-                localStorage.removeItem("username")
-                localStorage.removeItem("userid")
-                localStorage.removeItem("is_superuser")
-                localStorage.removeItem("is_staff")
+                cleanLocalStorage();
                 resolve()
             })
         },
@@ -266,13 +252,7 @@ const store = new Vuex.Store({
                 axios.delete(USERS_RESOURCE_URL + `${getters.userid}/`, user)
                     .then(resp => {
                         commit(AUTH_DELETE_SUCCESS, resp)
-                        localStorage.removeItem("preferred_working_hours")
-                        localStorage.removeItem("email")
-                        localStorage.removeItem("username")
-                        localStorage.removeItem("user-token")
-                        localStorage.removeItem("userid")
-                        localStorage.removeItem("is_superuser")
-                        localStorage.removeItem("is_staff")
+                        cleanLocalStorage();
                         resolve(resp)
                     })
                     .catch(err => {
@@ -1060,8 +1040,6 @@ const router = new VueRouter({
 
 router.beforeEach((to, from, next) => {
     if (to.matched.some(record => record.meta.requiresAuth)) {
-        // this route requires auth, check if logged in
-        // if not, redirect to login page.
         if (!store.getters.isAuthenticated) {
             next({name: 'login'})
         } else {
@@ -1073,10 +1051,10 @@ router.beforeEach((to, from, next) => {
                 if (!store.getters.is_superuser && !store.getters.is_staff) {
                     next({name: 'default'})
                 }
-            next() // go to wherever I'm going
+            next()
         }
     } else {
-        next() // does not require auth, make sure to always call next()!
+        next()
     }
 })
 
@@ -1099,3 +1077,23 @@ const mainApp = new Vue({
         },
     },
 }).$mount('#app')
+
+function setLocalStorage(auth_resp) {
+    localStorage.setItem("user-token", auth_resp.data.token)
+    localStorage.setItem("preferred_working_hours", auth_resp.data.preferred_working_hours)
+    localStorage.setItem("email", auth_resp.data.email)
+    localStorage.setItem("username", auth_resp.data.username)
+    localStorage.setItem("userid", auth_resp.data.user_id)
+    localStorage.setItem("is_superuser", auth_resp.data.is_superuser)
+    localStorage.setItem("is_staff", auth_resp.data.is_staff)
+}
+
+function cleanLocalStorage() {
+    localStorage.removeItem("user-token")
+    localStorage.removeItem("preferred_working_hours")
+    localStorage.removeItem("email")
+    localStorage.removeItem("username")
+    localStorage.removeItem("userid")
+    localStorage.removeItem("is_superuser")
+    localStorage.removeItem("is_staff")
+}

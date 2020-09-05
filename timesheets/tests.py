@@ -94,7 +94,7 @@ class TimesheetManageTests(APITestCase):
 
         self.assertEqual(response.data['description'], work_log['description'])
 
-    def test_user_can_get_multiple_logged_time(self):
+    def test_user_can_get_multiple_logged_times(self):
         work_log = {"description": "installing software1", "duration": 10, "workday": "2020-09-03"}
         response = self.client.post(self.work_resource_url, work_log, format='json')
         self.assertEqual(response.status_code, 201)

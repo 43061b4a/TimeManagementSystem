@@ -23,9 +23,10 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 SECRET_KEY = 'zn%_*2+@&k%!g!dqh+!_9=g1x&-f21w&sr$@(npv5*@4o@owcj'
 
 # SECURITY WARNING: don't run with debug turned on in production!
+
 DEBUG = True
 
-ALLOWED_HOSTS = ['hakaishiner.uc.r.appspot.com']
+ALLOWED_HOSTS = ['*']
 
 # Application definition
 
@@ -73,6 +74,7 @@ WSGI_APPLICATION = 'TimeManagementSystem.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
+
 
 DATABASES = {
     'default': {

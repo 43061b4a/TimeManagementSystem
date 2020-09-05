@@ -22,8 +22,11 @@ python manage.py runserver
 Tests:
 coverage run --source=timesheets ./manage.py test ; coverage report  
 
+Deploy:
+gcloud app deploy --project [YOUR_PROJECT_ID] (eg: gcloud app deploy --project hakaishiner)
+URL: https://hakaishiner.uc.r.appspot.com/
+
 django-admin startapp timesheets
-curl -H 'Accept: application/json; indent=4' -u admin:dimsumdim123 http://127.0.0.1:8000/users/
 
 python manage.py shell  
 from rest_framework.renderers import JSONRenderer

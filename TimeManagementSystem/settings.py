@@ -25,7 +25,7 @@ SECRET_KEY = 'zn%_*2+@&k%!g!dqh+!_9=g1x&-f21w&sr$@(npv5*@4o@owcj'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['hakaishiner.uc.r.appspot.com']
 
 # Application definition
 
@@ -108,6 +108,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = 'static_media/'
 
 STATICFILES_DIRS = [
     BASE_DIR / "static",

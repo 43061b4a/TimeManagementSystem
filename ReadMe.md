@@ -1,62 +1,84 @@
 
-![HomeScreen Image](./media/homescreen.png "Home Screen")
+![Homepage](https://i.imgur.com/kbmMTwY.png)
 
 ## About
 
-Timesheet management app based on `Django`, `Django-REST Framework` and `VueJs`.
+Timesheet management app based on `Django`, `Django-REST Framework` and `VueJs`. This project is developed in response to Toptal's screening process.
 
 ## Application Init
+
+### Delete Exiting Database, Migrations and make new Migrations
 ```
 rm -f db.sqlite3
 rm -r timesheets/migrations
 python manage.py makemigrations timesheets
 python manage.py migrate
+```
+### Setup Users
+```
 echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_superuser('superadmin', 'superadmin@myproject.com', 'password123')" | python manage.py shell
 echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_user('admin', 'admin@myproject.com', 'password123',is_staff=True)" | python manage.py shell
 echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.create_user('user', 'user@myproject.com', 'password123')" | python manage.py shell
+```
+### Setup Initial Data 
+```
+python manage.py loaddata ./timesheets/fixtures/initial_data.json
+```
+### Start Application
+Assuming all the required packages are installed. 
+```
 python manage.py runserver
 ```
-
-## Useful commands:
+### Running Tests with Coverage
 ```
-Tests:
 coverage run --source=timesheets ./manage.py test ; coverage report  
+```
 
-Deploy:
+### Deploy to Google Cloud
+```
 gcloud app deploy --project [YOUR_PROJECT_ID] (eg: gcloud app deploy --project hakaishiner)
-URL: https://hakaishiner.uc.r.appspot.com/
 
-django-admin startapp timesheets
+```
 
-python manage.py shell  
-from rest_framework.renderers import JSONRenderer
-from rest_framework.parsers import JSONParser
-from timesheets.models import Work
-from timesheets.serializers import TimesheetSerializer
+### Live App
+(With readonly database) 
+```
+https://hakaishiner.uc.r.appspot.com/
+Logins:
 
-work = Work(description="Apple", duration=1,workday="2020-10-1")
-work.save()
-work = Work(description="Cat", duration=2,workday="2020-10-1")
-work.save()
-seri = TimesheetSerializer(work)__
-seri.data
+Regular User:
+Username: user
+Password: password123
 
-from django.contrib.auth import get_user_model
-from pprint import pprint
+User Manager:
+Username: admin
+Password: password123
 
-User = get_user_model()
-user=User.objects.create(username="myname",password="apple")
-pprint(user)
-user = User.objects.get(username="myname")
-pprint(user)
-user.is_staff = True
-user.is_admin = True
-user.is_superuser = True
-user.save()
+System Admin:
+Username: superuser
+Password: password123
+```
 
+### Application logs
+```
+gcloud app logs tail -s default --project hakaishiner
+```
 
-user.is_staff = False
-user.is_admin = False
-user.is_superuser = False
-user.save()
+### Test Coverage
+```
+Name                                    Stmts   Miss  Cover
+-----------------------------------------------------------
+timesheets/__init__.py                      0      0   100%
+timesheets/apps.py                          3      0   100%
+timesheets/migrations/0001_initial.py       7      0   100%
+timesheets/migrations/__init__.py           0      0   100%
+timesheets/models.py                       15      1    93%
+timesheets/serializers.py                  47      2    96%
+timesheets/tests.py                       135      0   100%
+timesheets/urls.py                          3      0   100%
+timesheets/utils.py                         3      0   100%
+timesheets/views.py                       133     23    83%
+-----------------------------------------------------------
+TOTAL                                     346     26    92%
+
 ```

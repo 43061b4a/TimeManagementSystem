@@ -1,0 +1,314 @@
+[
+  {
+    "model": "timesheets.work",
+    "pk": 101,
+    "fields": {
+      "owner": 2,
+      "description": "Home page image editing",
+      "duration": 10,
+      "workday": "2020-09-04",
+      "created_at": "2020-09-05T04:19:46.747Z",
+      "updated_at": "2020-09-05T04:20:07.638Z"
+    }
+  },
+  {
+    "model": "timesheets.work",
+    "pk": 102,
+    "fields": {
+      "owner": 2,
+      "description": "Editing fourth draft",
+      "duration": 1,
+      "workday": "2020-09-05",
+      "created_at": "2020-09-05T04:21:16.558Z",
+      "updated_at": "2020-09-05T04:21:16.558Z"
+    }
+  },
+  {
+    "model": "timesheets.work",
+    "pk": 103,
+    "fields": {
+      "owner": 2,
+      "description": "Sending proposals",
+      "duration": 2,
+      "workday": "2020-09-06",
+      "created_at": "2020-09-05T04:21:20.244Z",
+      "updated_at": "2020-09-05T04:21:20.244Z"
+    }
+  },
+  {
+    "model": "timesheets.work",
+    "pk": 104,
+    "fields": {
+      "owner": 2,
+      "description": "Setting up submissions guidelines",
+      "duration": 3,
+      "workday": "2020-09-07",
+      "created_at": "2020-09-05T04:21:23.767Z",
+      "updated_at": "2020-09-05T04:21:23.767Z"
+    }
+  },
+  {
+    "model": "timesheets.work",
+    "pk": 105,
+    "fields": {
+      "owner": 2,
+      "description": "Meeting potential client",
+      "duration": 4,
+      "workday": "2020-09-04",
+      "created_at": "2020-09-05T04:21:28.660Z",
+      "updated_at": "2020-09-05T04:21:28.660Z"
+    }
+  },
+  {
+    "model": "timesheets.work",
+    "pk": 101,
+    "fields": {
+      "owner": 2,
+      "description": "Home page image editing",
+      "duration": 10,
+      "workday": "2020-09-02",
+      "created_at": "2020-09-05T04:19:46.747Z",
+      "updated_at": "2020-09-05T04:20:07.638Z"
+    }
+  },
+  {
+    "model": "timesheets.work",
+    "pk": 102,
+    "fields": {
+      "owner": 2,
+      "description": "Editing fourth draft",
+      "duration": 1,
+      "workday": "2020-09-04",
+      "created_at": "2020-09-05T04:21:16.558Z",
+      "updated_at": "2020-09-05T04:21:16.558Z"
+    }
+  },
+  {
+    "model": "timesheets.work",
+    "pk": 103,
+    "fields": {
+      "owner": 2,
+      "description": "Sending proposals",
+      "duration": 2,
+      "workday": "2020-09-03",
+      "created_at": "2020-09-05T04:21:20.244Z",
+      "updated_at": "2020-09-05T04:21:20.244Z"
+    }
+  },
+  {
+    "model": "timesheets.work",
+    "pk": 104,
+    "fields": {
+      "owner": 2,
+      "description": "Setting up submissions guidelines",
+      "duration": 3,
+      "workday": "2020-09-04",
+      "created_at": "2020-09-05T04:21:23.767Z",
+      "updated_at": "2020-09-05T04:21:23.767Z"
+    }
+  },
+  {
+    "model": "timesheets.work",
+    "pk": 105,
+    "fields": {
+      "owner": 2,
+      "description": "Meeting potential client",
+      "duration": 4,
+      "workday": "2020-09-01",
+      "created_at": "2020-09-05T04:21:28.660Z",
+      "updated_at": "2020-09-05T04:21:28.660Z"
+    }
+  },
+  {
+    "model": "timesheets.work",
+    "pk": 1,
+    "fields": {
+      "owner": 1,
+      "description": "Hiring Admins",
+      "duration": 10,
+      "workday": "2020-09-04",
+      "created_at": "2020-09-05T04:19:46.747Z",
+      "updated_at": "2020-09-05T04:20:07.638Z"
+    }
+  },
+  {
+    "model": "timesheets.work",
+    "pk": 2,
+    "fields": {
+      "owner": 1,
+      "description": "Firing Admins",
+      "duration": 1,
+      "workday": "2020-09-04",
+      "created_at": "2020-09-05T04:21:16.558Z",
+      "updated_at": "2020-09-05T04:21:16.558Z"
+    }
+  },
+  {
+    "model": "timesheets.work",
+    "pk": 3,
+    "fields": {
+      "owner": 1,
+      "description": "Sending superadmin proposals",
+      "duration": 2,
+      "workday": "2020-09-02",
+      "created_at": "2020-09-05T04:21:20.244Z",
+      "updated_at": "2020-09-05T04:21:20.244Z"
+    }
+  },
+  {
+    "model": "timesheets.work",
+    "pk": 4,
+    "fields": {
+      "owner": 1,
+      "description": "Setting up superadmin work guidelines",
+      "duration": 3,
+      "workday": "2020-09-04",
+      "created_at": "2020-09-05T04:21:23.767Z",
+      "updated_at": "2020-09-05T04:21:23.767Z"
+    }
+  },
+  {
+    "model": "timesheets.work",
+    "pk": 5,
+    "fields": {
+      "owner": 1,
+      "description": "Meeting potential superadmin client",
+      "duration": 4,
+      "workday": "2020-09-04",
+      "created_at": "2020-09-05T04:21:28.660Z",
+      "updated_at": "2020-09-05T04:21:28.660Z"
+    }
+  },
+  {
+    "model": "timesheets.work",
+    "pk": 6,
+    "fields": {
+      "owner": 1,
+      "description": "Home page superadmin image editing",
+      "duration": 10,
+      "workday": "2020-09-05",
+      "created_at": "2020-09-05T04:19:46.747Z",
+      "updated_at": "2020-09-05T04:20:07.638Z"
+    }
+  },
+  {
+    "model": "timesheets.work",
+    "pk": 7,
+    "fields": {
+      "owner": 1,
+      "description": "Editing fourth admin draft",
+      "duration": 1,
+      "workday": "2020-09-05",
+      "created_at": "2020-09-05T04:21:16.558Z",
+      "updated_at": "2020-09-05T04:21:16.558Z"
+    }
+  },
+  {
+    "model": "timesheets.work",
+    "pk": 8,
+    "fields": {
+      "owner": 1,
+      "description": "Sending proposals to users",
+      "duration": 2,
+      "workday": "2020-09-07",
+      "created_at": "2020-09-05T04:21:20.244Z",
+      "updated_at": "2020-09-05T04:21:20.244Z"
+    }
+  },
+  {
+    "model": "timesheets.work",
+    "pk": 9,
+    "fields": {
+      "owner": 1,
+      "description": "Setting up submissions guidelines for new users",
+      "duration": 3,
+      "workday": "2020-09-13",
+      "created_at": "2020-09-05T04:21:23.767Z",
+      "updated_at": "2020-09-05T04:21:23.767Z"
+    }
+  },
+  {
+    "model": "timesheets.work",
+    "pk": 10,
+    "fields": {
+      "owner": 1,
+      "description": "Meeting potential new users",
+      "duration": 4,
+      "workday": "2020-09-04",
+      "created_at": "2020-09-05T04:21:28.660Z",
+      "updated_at": "2020-09-05T04:21:28.660Z"
+    }
+  },
+  {
+    "model": "timesheets.work",
+    "pk": 11,
+    "fields": {
+      "owner": 3,
+      "description": "Editing fourth users draft",
+      "duration": 1,
+      "workday": "2020-09-19",
+      "created_at": "2020-09-05T04:21:16.558Z",
+      "updated_at": "2020-09-05T04:21:16.558Z"
+    }
+  },
+  {
+    "model": "timesheets.work",
+    "pk": 12,
+    "fields": {
+      "owner": 3,
+      "description": "Sending user details",
+      "duration": 2,
+      "workday": "2020-09-15",
+      "created_at": "2020-09-05T04:21:20.244Z",
+      "updated_at": "2020-09-05T04:21:20.244Z"
+    }
+  },
+  {
+    "model": "timesheets.work",
+    "pk": 13,
+    "fields": {
+      "owner": 3,
+      "description": "Setting up submissions guidelines by users",
+      "duration": 3,
+      "workday": "2020-09-10",
+      "created_at": "2020-09-05T04:21:23.767Z",
+      "updated_at": "2020-09-05T04:21:23.767Z"
+    }
+  },
+  {
+    "model": "timesheets.work",
+    "pk": 14,
+    "fields": {
+      "owner": 3,
+      "description": "Meeting potential new candidates",
+      "duration": 4,
+      "workday": "2020-09-07",
+      "created_at": "2020-09-05T04:21:28.660Z",
+      "updated_at": "2020-09-05T04:21:28.660Z"
+    }
+  },
+  {
+    "model": "timesheets.profile",
+    "pk": 1,
+    "fields": {
+      "owner": 2,
+      "preferred_working_hours": 15
+    }
+  },
+  {
+    "model": "timesheets.profile",
+    "pk": 2,
+    "fields": {
+      "owner": 1,
+      "preferred_working_hours": 10
+    }
+  },
+  {
+    "model": "timesheets.profile",
+    "pk": 3,
+    "fields": {
+      "owner": 3,
+      "preferred_working_hours": 8
+    }
+  }
+]

@@ -34,10 +34,10 @@
                     <span class="text-warning small">Logged in as {{ currentuser }}</span>
                 </router-link>
                 <ul class="navbar-nav ml-auto" v-if="isAuthenticated">
-                    <li class="nav-item" v-if="isSuperuser || isStaff">
+                    <li class="nav-item" v-if="isSuperuser">
                         <router-link to="/manage-timesheets" class="nav-link my-2">All Timesheets</router-link>
                     </li>
-                    <li class="nav-item" v-if="isSuperuser">
+                    <li class="nav-item" v-if="isSuperuser || isStaff">
                         <router-link to="/manage-users" class="nav-link my-2">All Users</router-link>
                     </li>
                     <li class="nav-item">
@@ -511,7 +511,7 @@
     </div>
 </template>
 
-<script src="{% static "index.js" %}"></script>
+<script type="application/javascript" src="{% static "index.js" %}"></script>
 <!-- jQuery first, then Popper.js, then Bootstrap JS -->
 <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"
         integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"

@@ -119,3 +119,86 @@ class TimesheetManageTests(APITestCase):
 
         response_get = self.client.get(reverse('work-detail', kwargs={'pk': response_create.data['id']}))
         self.assertEqual(response_get.status_code, 404)
+
+
+class AccountPermissionsTests(APITestCase):
+    def setUp(self) -> None:
+        self.superadmin = {'username': 'superadmin', 'password': 'password123', 'id': None,
+                           'work': {"description": "superadmin work", "duration": 10, "workday": "2020-07-30",
+                                    "id": None}}
+        self.admin = {'username': 'admin', 'password': 'password123', 'id': None,
+                      'work': {"description": "admin work", "duration": 10, "workday": "2020-07-30", "id": None}}
+        self.user = {'username': 'user', 'password': 'password123', 'id': None,
+                     'work': {"description": "user work", "duration": 10, "workday": "2020-07-30", "id": None}}
+
+        self.superadmin['id'] = User.objects.create_superuser(self.superadmin['username'], 'superadmin@myproject.com',
+                                                              self.superadmin['password']).id
+        self.admin['id'] = User.objects.create_user(self.admin['username'], 'admin@myproject.com',
+                                                    self.admin['password'], is_staff=True).id
+        self.user['id'] = User.objects.create_user(self.user['username'], 'user@myproject.com',
+                                                   self.user['password']).id
+
+        self.superadmin_auth_token = 'Token ' + (self.client.post(reverse('api_token_auth'),
+                                                                  self.superadmin, format='json')).data['token']
+        self.client = APIClient()
+        self.client.credentials(HTTP_AUTHORIZATION=self.superadmin_auth_token)
+        self.superadmin['work']['id'] = \
+            self.client.post(reverse('work-list'), self.superadmin['work'], format='json').data['id']
+
+        self.admin_auth_token = 'Token ' + (self.client.post(reverse('api_token_auth'),
+                                                             self.admin, format='json')).data['token']
+        self.client.credentials(HTTP_AUTHORIZATION=self.admin_auth_token)
+        self.admin['work']['id'] = self.client.post(reverse('work-list'), self.admin['work'], format='json').data['id']
+
+        self.user_auth_token = 'Token ' + (self.client.post(reverse('api_token_auth'),
+                                                            self.user, format='json')).data['token']
+        self.client.credentials(HTTP_AUTHORIZATION=self.user_auth_token)
+        self.user['work']['id'] = self.client.post(reverse('work-list'), self.user['work'], format='json').data['id']
+
+    def test_user_cannot_get_admin_work(self):
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION=self.user_auth_token)
+        response = client.get(reverse('work-detail', kwargs={'pk': self.superadmin['work']['id']}))
+        self.assertEqual(response.status_code, 404)
+
+    def test_admin_cannot_get_superuser_work(self):
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION=self.admin_auth_token)
+        response = client.get(reverse('work-detail', kwargs={'pk': self.superadmin['work']['id']}))
+        self.assertEqual(response.status_code, 404)
+
+    def test_superadmin_can_get_admin_work(self):
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION=self.superadmin_auth_token)
+        response = client.get(reverse('work-detail', kwargs={'pk': self.admin['work']['id']}))
+        self.assertEqual(response.status_code, 200)
+
+    def test_superadmin_can_get_user_work(self):
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION=self.superadmin_auth_token)
+        response = client.get(reverse('work-detail', kwargs={'pk': self.user['work']['id']}))
+        self.assertEqual(response.status_code, 200)
+
+    def test_user_cannot_delete_admin_work(self):
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION=self.user_auth_token)
+        response = client.delete(reverse('work-detail', kwargs={'pk': self.superadmin['work']['id']}))
+        self.assertEqual(response.status_code, 401)
+
+    def test_admin_cannot_delete_superuser_work(self):
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION=self.admin_auth_token)
+        response = client.delete(reverse('work-detail', kwargs={'pk': self.superadmin['work']['id']}))
+        self.assertEqual(response.status_code, 401)
+
+    def test_superadmin_can_delete_admin_work(self):
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION=self.superadmin_auth_token)
+        response = client.delete(reverse('work-detail', kwargs={'pk': self.admin['work']['id']}))
+        self.assertEqual(response.status_code, 204)
+
+    def test_superadmin_can_delete_user_work(self):
+        client = APIClient()
+        client.credentials(HTTP_AUTHORIZATION=self.superadmin_auth_token)
+        response = client.delete(reverse('work-detail', kwargs={'pk': self.user['work']['id']}))
+        self.assertEqual(response.status_code, 204)

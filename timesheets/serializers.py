@@ -19,7 +19,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         fields = ['preferred_working_hours']
 
 
-class UserAdminSerializer(serializers.ModelSerializer):
+class RegisteredUserSerializer(serializers.ModelSerializer):
     profile = ProfileSerializer()
 
     class Meta:

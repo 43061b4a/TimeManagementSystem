@@ -1015,6 +1015,7 @@ const routes = [
         component: TimesheetsAdmin,
         meta: {
             requiresAuth: true,
+            requiresSuperuser: true,
             requiresAdmin: true,
         }
     },
@@ -1024,7 +1025,7 @@ const routes = [
         component: UsersAdmin,
         meta: {
             requiresAuth: true,
-            requiresSuperuser: true
+            requiresAdmin: true,
         }
     },
     {
@@ -1043,12 +1044,12 @@ router.beforeEach((to, from, next) => {
         if (!store.getters.isAuthenticated) {
             next({name: 'login'})
         } else {
-            if (to.matched.some(record => record.meta.requiresSuperuser))
-                if (!store.getters.is_superuser) {
+            if (to.matched.some(record => record.meta.requiresSuperuser && record.meta.requiresAdmin))
+                if (!store.getters.is_superuser || !store.getters.is_staff) {
                     next({name: 'default'})
                 }
             if (to.matched.some(record => record.meta.requiresAdmin))
-                if (!store.getters.is_superuser && !store.getters.is_staff) {
+                if (!store.getters.is_staff) {
                     next({name: 'default'})
                 }
             next()

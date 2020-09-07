@@ -20,11 +20,11 @@ BASE_DIR = Path(__file__).resolve(strict=True).parent.parent
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'zn%_*2+@&k%!g!dqh+!_9=g1x&-f21w&sr$@(npv5*@4o@owcj'
+SECRET_KEY = 'zn%_*2+@&k%!g!jshdfkjhsd+!_9=g1x&-sdfsdfsd&sr$@(npv5*@4o@owcj'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-
 DEBUG = True
+
 
 ALLOWED_HOSTS = ['*']
 
@@ -122,3 +122,7 @@ REST_FRAMEWORK = {
     ],
     'TEST_REQUEST_DEFAULT_FORMAT': 'json'
 }
+
+FIXTURE_DIRS = (
+    [os.path.join(BASE_DIR, '/timesheets/fixtures/')]
+)

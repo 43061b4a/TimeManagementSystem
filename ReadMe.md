@@ -3,7 +3,7 @@
 
 ## About
 
-Timesheet management app based on `Django`, `Django-REST Framework` and `VueJs`. This project is developed in response to Toptal's screening process.
+Timesheet management app based on `Django`, `Django-REST Framework` and `VueJs`. 
 
 ## Application Init
 

@@ -9,10 +9,10 @@ Timesheet management app based on `Django`, `Django-REST Framework` and `VueJs`.
 
 ### Delete Exiting Database, Migrations and make new Migrations
 ```
-rm -f db.sqlite3
-rm -r timesheets/migrations
-python manage.py makemigrations timesheets
-python manage.py migrate
+rm -f db.sqlite3;
+rm -r timesheets/migrations;
+python manage.py makemigrations timesheets;
+python manage.py migrate;
 ```
 ### Setup Users
 ```
@@ -55,7 +55,7 @@ Username: admin
 Password: password123
 
 System Admin:
-Username: superuser
+Username: superadmin
 Password: password123
 ```
 

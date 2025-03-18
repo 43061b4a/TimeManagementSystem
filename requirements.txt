@@ -1,6 +1,6 @@
 asgiref==3.2.10
 coverage==5.2.1
-Django==3.2.25
+Django==4.2.20
 django-filter==2.4.0
 djangorestframework==3.11.2
 Markdown==3.2.2

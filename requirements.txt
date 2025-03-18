@@ -1,9 +1,9 @@
 asgiref==3.2.10
 coverage==5.2.1
-Django==3.2.24
+Django==3.2.25
 django-filter==2.4.0
 djangorestframework==3.11.2
 Markdown==3.2.2
 pytz==2020.1
-sqlparse==0.4.4
+sqlparse==0.5.0
 gunicorn==22.0.0
